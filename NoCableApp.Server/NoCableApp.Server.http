@@ -1,0 +1,6 @@
+@NoCableApp.Server_HostAddress = http://localhost:5038
+
+GET {{NoCableApp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
