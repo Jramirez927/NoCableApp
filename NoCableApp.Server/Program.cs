@@ -1,4 +1,9 @@
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using NoCableApp.Server.Data;
+using NoCableApp.Server.Models;
+
 namespace NoCableApp.Server
 {
     public class Program
@@ -6,6 +11,32 @@ namespace NoCableApp.Server
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            //Configuration
+            var configuration = builder.Configuration;
+
+            //Add DbContext
+            builder.Services.AddDbContext<NoCableDbContext>(options => 
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection"),
+                sliteOptions => sliteOptions.MigrationsAssembly("NoCableApp.Data.Migrations")
+            ));
+            //Add Identity
+            builder.Services.AddIdentity<NoCableUser, IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+            })
+            .AddEntityFrameworkStores<NoCableDbContext>()
+            .AddDefaultTokenProviders();
+
+            //Configure JWT Auth 
 
             // Add services to the container.
 
