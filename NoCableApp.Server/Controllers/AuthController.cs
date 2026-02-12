@@ -1,0 +1,116 @@
+using System.Web;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using NoCableApp.Server.Models;
+
+namespace NoCableApp.Server.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class AuthController : ControllerBase
+{
+    private readonly UserManager<NoCableUser> _userManager;
+    private readonly SignInManager<NoCableUser> _signInManager;
+    private readonly IEmailSender _emailSender;
+
+    public AuthController(
+        UserManager<NoCableUser> userManager,
+        SignInManager<NoCableUser> signInManager,
+        IEmailSender emailSender)
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _emailSender = emailSender;
+    }
+
+    // POST api/auth/register
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterRequest request)
+    {
+        var user = new NoCableUser { UserName = request.Email, Email = request.Email };
+        var result = await _userManager.CreateAsync(user, request.Password);
+
+        if (!result.Succeeded)
+            return BadRequest(result.Errors);
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        var confirmationLink = Url.Action(
+            nameof(ConfirmEmail), "Auth",
+            new { userId = user.Id, token = HttpUtility.UrlEncode(token) },
+            Request.Scheme)!;
+
+        await _emailSender.SendEmailAsync(
+            user.Email,
+            "Confirm your NoCable account",
+            $"<a href=\"{confirmationLink}\">Click here to confirm your email</a>");
+
+        return Ok(new { message = "Registration successful. Check your email to confirm." });
+    }
+
+    // GET api/auth/confirm-email?userId=xxx&token=yyy
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return BadRequest("Invalid user.");
+
+        var decoded = HttpUtility.UrlDecode(token);
+        var result = await _userManager.ConfirmEmailAsync(user, decoded);
+
+        if (!result.Succeeded)
+            return BadRequest("Invalid or expired confirmation token.");
+
+        return Ok(new { message = "Email confirmed! You can now log in." });
+    }
+
+    // POST api/auth/login
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+            return Unauthorized("Invalid credentials.");
+
+        var result = await _signInManager.PasswordSignInAsync(
+            user,
+            request.Password,
+            isPersistent: false,
+            lockoutOnFailure: true);
+
+        if (result.IsLockedOut)
+            return Unauthorized("Account locked. Try again in 5 minutes.");
+
+        if (result.IsNotAllowed)
+            return Unauthorized("You must confirm your email before logging in.");
+
+        if (!result.Succeeded)
+            return Unauthorized("Invalid credentials.");
+
+        return Ok(new { message = "Logged in." });
+    }
+
+    // POST api/auth/logout
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return Ok(new { message = "Logged out." });
+    }
+
+    // GET api/auth/me
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+            return Unauthorized();
+
+        return Ok(new { user.Email });
+    }
+}

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NoCableApp.Server.Data;
 using NoCableApp.Server.Models;
+using NoCableApp.Server.Services;
 
 namespace NoCableApp.Server
 {
@@ -17,10 +18,8 @@ namespace NoCableApp.Server
             var configuration = builder.Configuration;
 
             //Add DbContext
-            builder.Services.AddDbContext<NoCableDbContext>(options => 
-                options.UseSqlite(configuration.GetConnectionString("DefaultConnection"),
-                sliteOptions => sliteOptions.MigrationsAssembly("NoCableApp.Data.Migrations")
-            ));
+            builder.Services.AddDbContext<NoCableDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
             //Add Identity
             builder.Services.AddIdentity<NoCableUser, IdentityRole>(options =>
             {
@@ -44,7 +43,27 @@ namespace NoCableApp.Server
             // Register a development email sender. Replace with SMTP/SendGrid in production.
             builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
-            builder.Services.AddAuthentication();
+            // Configure cookie authentication
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
+                options.SlidingExpiration = true;
+
+                // Return 401/403 status codes instead of redirecting (this is an API, not MVC)
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+            });
 
             builder.Services.AddAuthorization();
 
@@ -69,6 +88,7 @@ namespace NoCableApp.Server
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

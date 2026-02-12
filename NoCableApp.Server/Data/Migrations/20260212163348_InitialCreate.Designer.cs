@@ -11,7 +11,7 @@ using NoCableApp.Server.Data;
 namespace NoCableApp.Server.Data.Migrations
 {
     [DbContext(typeof(NoCableDbContext))]
-    [Migration("20260212033009_InitialCreate")]
+    [Migration("20260212163348_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
