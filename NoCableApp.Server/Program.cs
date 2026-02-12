@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using NoCableApp.Server.Data;
 using NoCableApp.Server.Models;
@@ -36,7 +37,16 @@ namespace NoCableApp.Server
             .AddEntityFrameworkStores<NoCableDbContext>()
             .AddDefaultTokenProviders();
 
-            //Configure JWT Auth 
+            // Configure token lifespan for email confirmation (adjust as needed)
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                opt.TokenLifespan = TimeSpan.FromDays(3));
+
+            // Register a development email sender. Replace with SMTP/SendGrid in production.
+            builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+
+            builder.Services.AddAuthentication();
+
+            builder.Services.AddAuthorization();
 
             // Add services to the container.
 
