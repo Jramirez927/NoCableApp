@@ -3,7 +3,7 @@ import '../../index.css'
 import './styles.css'
 import { Link } from 'react-router-dom'
 
-function LandingPage() {
+function Home() {
 
   return (
     <>
@@ -20,4 +20,4 @@ function LandingPage() {
   )
 }
 
-export default LandingPage
+export default Home
