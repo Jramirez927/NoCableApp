@@ -1,28 +1,40 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [input, setInput] = useState({
+        email: "",
+        password: ""
+    })
     const [remember, setRemember] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState({
+        email: "",
+        password: ""
+    });
 
     function validate() {
-        if (!email) return "Email is required.";
+        let errors = {
+            email: "",
+            password: ""
+        }
+        if (!input.email)  errors.email = "Email is required.";
         // simple email check
-        if (!/^\S+@\S+\.\S+$/.test(email)) return "Enter a valid email.";
-        if (!password) return "Password is required.";
-        return "";
+        else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
+        if (!input.password) errors.password = "Password is required.";
+        return errors;
     }
 
     async function handleSubmit(e) {
         e.preventDefault();
-        setError("");
+        setError({
+            email: "",
+            password: ""
+        });
         const v = validate();
-        if (v) {
+        if (v.email || v.password) {
             setError(v);
             return;
         }
@@ -32,7 +44,7 @@ export default function LoginPage() {
             const res = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email: input.email, password: input.password }),
             });
 
             const body = await res.json();
@@ -56,32 +68,33 @@ export default function LoginPage() {
     }
 
     return (
-        <div>
+        <div style={{ minWidth: '360px' }}>
             <form onSubmit={handleSubmit} aria-label="Login form" style={{ display: "flex", flexDirection: "column" }}>
                 <h1>Sign in</h1>
 
-                {error && <div style={{padding:'0px'}} role="alert">{error}</div>}
+                {error.email && <div style={{ padding: '0px' }} role="alert">{error.email}</div>}
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px' , width:'100%'}}>
+                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%' }}>
                     <input
                         type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={input.email}
+                        onChange={(e) => setInput({ ...input, email: e.target.value })}
                         autoComplete="email"
                         required
                         placeholder="Email"
-                        style={{width: '100%'}}
+                        style={{ width: '100%' }}
                     />
                 </label>
 
-                <label style={{ marginBottom:'12px', display: "flex", flexDirection: "row", height: '32px', width:'100%', position: 'relative' }}>
+                {error.password && <div style={{ padding: '0px' }} role="alert">{error.password}</div>}
+                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%', position: 'relative' }}>
                     <input
                         type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={input.password}
+                        onChange={(e) => setInput({ ...input, password: e.target.value })}
                         autoComplete="current-password"
-                        required
                         placeholder="Password"
+                        required
                         style={{ width: '100%', paddingRight: '36px' }}
                     />
                     <button
@@ -114,7 +127,7 @@ export default function LoginPage() {
                     <a href="/forgot">Forgot Password?</a>
                 </label>
 
-                <button type="submit" disabled={loading} style={{marginBottom: '12px'}}>
+                <button type="submit" disabled={loading} style={{ marginBottom: '12px' }}>
                     {loading ? "Signing in..." : "Sign in"}
                 </button>
 
