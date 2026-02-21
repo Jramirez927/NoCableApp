@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./login.module.css"
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function LoginPage() {
             email: "",
             password: ""
         }
-        if (!input.email)  errors.email = "Email is required.";
+        if (!input.email) errors.email = "Email is required.";
         // simple email check
         else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
         if (!input.password) errors.password = "Password is required.";
@@ -68,13 +69,13 @@ export default function LoginPage() {
     }
 
     return (
-        <div style={{ minWidth: '360px' }}>
-            <form onSubmit={handleSubmit} aria-label="Login form" style={{ display: "flex", flexDirection: "column" }}>
+        <div className={styles.container}>
+            <form onSubmit={handleSubmit} aria-label="Login form" className={styles.form}>
                 <h1>Sign in</h1>
 
-                {error.email && <div style={{ padding: '0px' }} role="alert">{error.email}</div>}
+                {error.email && <div className={styles.errorMessage} role="alert">{error.email}</div>}
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%' }}>
+                <label className={styles.emailLabel}>
                     <input
                         type="email"
                         value={input.email}
@@ -82,12 +83,11 @@ export default function LoginPage() {
                         autoComplete="email"
                         required
                         placeholder="Email"
-                        style={{ width: '100%' }}
                     />
                 </label>
 
-                {error.password && <div style={{ padding: '0px' }} role="alert">{error.password}</div>}
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%', position: 'relative' }}>
+                {error.password && <div className={styles.errorMessage} role="alert">{error.password}</div>}
+                <label className={styles.passwordLabel}>
                     <input
                         type={showPassword ? "text" : "password"}
                         value={input.password}
@@ -95,13 +95,12 @@ export default function LoginPage() {
                         autoComplete="current-password"
                         placeholder="Password"
                         required
-                        style={{ width: '100%', paddingRight: '36px' }}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword((s) => !s)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0px' }}
+                        className={styles.togglePassword}
                     >
                         {showPassword ? (
                             <span className="material-symbols-outlined">
@@ -115,7 +114,7 @@ export default function LoginPage() {
                     </button>
                 </label>
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", justifyContent: 'space-between' }}>
+                <label className={styles.rememberRow}>
                     <div>
                         <input
                             type="checkbox"
@@ -127,7 +126,7 @@ export default function LoginPage() {
                     <a href="/forgot">Forgot Password?</a>
                 </label>
 
-                <button type="submit" disabled={loading} style={{ marginBottom: '12px' }}>
+                <button type="submit" disabled={loading} className={styles.submitButton}>
                     {loading ? "Signing in..." : "Sign in"}
                 </button>
 

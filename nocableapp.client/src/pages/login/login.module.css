@@ -1,0 +1,58 @@
+/* login.module.css */
+
+.container {
+    min-width: 360px;
+}
+.form {
+    display: flex;
+    flex-direction: column;
+}
+.errorMessage {
+    padding: 0px;
+    color:crimson;
+}
+.emailLabel { 
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: row;
+    height: 32px;
+    width: 100%;
+}
+.emailLabel > input {
+    width: 100%;
+}
+.passwordLabel { 
+    margin-bottom: 12px; 
+    display: flex; 
+    flex-direction: row;
+    height: 32px;
+    width: 100%;
+    position: relative; 
+}
+.passwordLabel > input {
+    width: 100%;
+    padding-right: 36px;
+}
+.togglePassword { 
+    position: absolute; 
+    right: 4px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    background: none; 
+    border: none; 
+    cursor: pointer;
+    display: flex;
+    align-items: center; 
+    padding: 0px;
+}
+
+.rememberRow {
+    margin-bottom: 12px;
+    display: flex; 
+    flex-direction: row;
+    justify-content: space-between;
+ }
+
+ .submitButton {
+    margin-bottom: 12px;
+ }
