@@ -24,6 +24,16 @@ export default function RegisterPage() {
         // simple email check
         else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
         if (!input.password) errors.password = "Password is required.";
+        else {
+            if(input.password.length < 8) errors.password = "Password required to be a length of 8 or greater"
+            if(!/[A-Z]/.test(input.password)) errors.password = "Password requires uppercase alphabet characters (A-Z)"
+            if(!/[a-z]/.test(input.password)) errors.password = "Passowrd requires lowercase alphabt characters (a-z)"
+            if(!/[0-9]/.test(input.password)) errors.password = "Password requires numeric characters (0-9)"
+            //RequireNonAlphanumeric
+            if (!/[^a-zA-Z0-9]/.test(input.password)) errors.password = "Password requires a non-alphanumeric character (e.g. @, #, !)"
+            if (/\s/.test(input.password)) errors.password = "Password must not contain spaces"
+
+        }
         if (!input.confirmPassword) errors.confirmPassword = "Confirmed password is required."
         else if (input.password !== input.confirmPassword) errors.confirmPassword = "Confirm password does not match."
         return errors;
