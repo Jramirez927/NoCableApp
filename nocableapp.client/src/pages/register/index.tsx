@@ -19,8 +19,8 @@ export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    function validate() {
-        let errors = {}
+    function validate(): { email: string; password: string; confirmPassword: string } {
+        const errors = { email: "", password: "", confirmPassword: "" }
         if (!input.email) errors.email = "Email is required.";
         // simple email check
         else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
@@ -40,7 +40,7 @@ export default function RegisterPage() {
         return errors;
     }
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setError({
             email: "",
@@ -58,7 +58,7 @@ export default function RegisterPage() {
             await register(input.email, input.password);
             navigate("/", { replace: true });
         } catch (err) {
-            setFetchError(err.message || "Network error. Try again.");
+            setFetchError(err instanceof Error ? err.message : "Network error. Try again.");
             setLoading(false);
         }
     }

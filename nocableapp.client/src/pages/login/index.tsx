@@ -28,7 +28,7 @@ export default function LoginPage() {
         return errors;
     }
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setError({
             email: "",
@@ -45,7 +45,8 @@ export default function LoginPage() {
             await login(input.email, input.password);
             navigate("/", { replace: true });
         } catch (err) {
-            setError(err.message || "Network error. Try again.");
+            const message = err instanceof Error ? err.message : "Network error. Try again.";
+            setError({ email: "", password: message });
             setLoading(false);
         }
     }
