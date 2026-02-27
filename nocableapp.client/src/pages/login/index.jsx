@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { login } from "../../api/authentication";
 import styles from "./login.module.css"
 
 export default function LoginPage() {
@@ -8,7 +9,6 @@ export default function LoginPage() {
         email: "",
         password: ""
     })
-    const [remember, setRemember] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState({
@@ -42,28 +42,10 @@ export default function LoginPage() {
 
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: input.email, password: input.password }),
-            });
-
-            const body = await res.json();
-            if (!res.ok) {
-                setError(body?.message || "Login failed.");
-                setLoading(false);
-                return;
-            }
-
-            const token = body?.token;
-            if (token) {
-                if (remember) localStorage.setItem("auth_token", token);
-                else sessionStorage.setItem("auth_token", token);
-            }
-
+            await login(input.email, input.password);
             navigate("/", { replace: true });
         } catch (err) {
-            setError("Network error. Try again.");
+            setError(err.message || "Network error. Try again.");
             setLoading(false);
         }
     }
@@ -114,17 +96,9 @@ export default function LoginPage() {
                     </button>
                 </label>
 
-                <label className={styles.rememberRow}>
-                    <div>
-                        <input
-                            type="checkbox"
-                            checked={remember}
-                            onChange={(e) => setRemember(e.target.checked)}
-                        />
-                        <span>Remember me</span>
-                    </div>
+                <div className={styles.rememberRow}>
                     <a href="/forgot">Forgot Password?</a>
-                </label>
+                </div>
 
                 <button type="submit" disabled={loading} className={styles.submitButton}>
                     {loading ? "Signing in..." : "Sign in"}

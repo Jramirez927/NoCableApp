@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { register } from "../../api/authentication";
 import styles from "./register.module.css"
 
 export default function RegisterPage() {
@@ -54,28 +55,10 @@ export default function RegisterPage() {
 
         setLoading(true);
         try {
-            const res = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: input.email, password: input.password }),
-            });
-
-            const body = await res.json();
-            if (!res.ok) {
-                setFetchError(body?.message || "Registering your account failed.");
-                setLoading(false);
-                return;
-            }
-
-            const token = body?.token;
-            if (token) {
-                if (remember) localStorage.setItem("auth_token", token);
-                else sessionStorage.setItem("auth_token", token);
-            }
-
+            await register(input.email, input.password);
             navigate("/", { replace: true });
         } catch (err) {
-            setFetchError("Network error. Try again.");
+            setFetchError(err.message || "Network error. Try again.");
             setLoading(false);
         }
     }
