@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import styles from "./register.module.css"
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function RegisterPage() {
         password: "",
         confirmPassword: ""
     })
-    const [fetchError , setFetchError] = useState("")
+    const [fetchError, setFetchError] = useState("")
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -25,10 +25,10 @@ export default function RegisterPage() {
         else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
         if (!input.password) errors.password = "Password is required.";
         else {
-            if(input.password.length < 8) errors.password = "Password required to be a length of 8 or greater"
-            if(!/[A-Z]/.test(input.password)) errors.password = "Password requires uppercase alphabet characters (A-Z)"
-            if(!/[a-z]/.test(input.password)) errors.password = "Passowrd requires lowercase alphabt characters (a-z)"
-            if(!/[0-9]/.test(input.password)) errors.password = "Password requires numeric characters (0-9)"
+            if (input.password.length < 8) errors.password = "Password required to be a length of 8 or greater"
+            if (!/[A-Z]/.test(input.password)) errors.password = "Password requires uppercase alphabet characters (A-Z)"
+            if (!/[a-z]/.test(input.password)) errors.password = "Passowrd requires lowercase alphabt characters (a-z)"
+            if (!/[0-9]/.test(input.password)) errors.password = "Password requires numeric characters (0-9)"
             //RequireNonAlphanumeric
             if (!/[^a-zA-Z0-9]/.test(input.password)) errors.password = "Password requires a non-alphanumeric character (e.g. @, #, !)"
             if (/\s/.test(input.password)) errors.password = "Password must not contain spaces"
@@ -81,38 +81,36 @@ export default function RegisterPage() {
     }
 
     return (
-        <div style={{ minWidth: '360px' }}>
-            <form onSubmit={handleSubmit} aria-label="Register form" style={{ display: "flex", flexDirection: "column" }}>
+        <div className={styles.container}>
+            <form onSubmit={handleSubmit} aria-label="Register form" className={styles.form}>
                 <h1>Register</h1>
-                {fetchError && <div style={{ padding: '0px' }} role="alert">{fetchError}</div>}
-                {error.email && <div style={{ padding: '0px' }} role="alert">{error.email}</div>}
+                {fetchError && <div className={styles.errorMessage} role="alert">{fetchError}</div>}
+                {error.email && <div className={styles.errorMessage} role="alert">{error.email}</div>}
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%' }}>
+                <label className={styles.emailLabel}>
                     <input
                         type="email"
                         value={input.email}
                         onChange={(e) => setInput({ ...input, email: e.target.value })}
                         required
                         placeholder="Email"
-                        style={{ width: '100%' }}
                     />
                 </label>
-                {error.password && <div style={{ padding: '0px' }} role="alert">{error.password}</div>}
+                {error.password && <div className={styles.errorMessage} role="alert">{error.password}</div>}
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%', position: 'relative' }}>
+                <label className={styles.passwordLabel}>
                     <input
                         type={showPassword ? "text" : "password"}
                         value={input.password}
                         onChange={(e) => setInput({ ...input, password: e.target.value })}
                         required
                         placeholder="Password"
-                        style={{ width: '100%', paddingRight: '36px' }}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword((s) => !s)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0px' }}
+                        className={styles.togglePassword}
                     >
                         {showPassword ? (
                             <span className="material-symbols-outlined">
@@ -126,22 +124,21 @@ export default function RegisterPage() {
                     </button>
                 </label>
 
-                {error.confirmPassword && <div style={{ padding: '0px' }} role="alert">{error.confirmPassword}</div>}
+                {error.confirmPassword && <div className={styles.errorMessage} role="alert">{error.confirmPassword}</div>}
 
-                <label style={{ marginBottom: '12px', display: "flex", flexDirection: "row", height: '32px', width: '100%', position: 'relative' }}>
+                <label className={styles.passwordLabel}>
                     <input
                         type={showPassword ? "text" : "password"}
                         value={input.confirmPassword}
                         onChange={(e) => setInput({ ...input, confirmPassword: e.target.value })}
                         required
                         placeholder="Confirm Password"
-                        style={{ width: '100%', paddingRight: '36px' }}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword((s) => !s)}
                         aria-label={showPassword ? "Hide password" : "Show password"}
-                        style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0px' }}
+                        className={styles.togglePassword}
                     >
                         {showPassword ? (
                             <span className="material-symbols-outlined">
@@ -155,7 +152,7 @@ export default function RegisterPage() {
                     </button>
                 </label>
 
-                <button type="submit" disabled={loading} style={{ marginBottom: '12px' }}>
+                <button type="submit" disabled={loading} className={styles.submitButton}>
                     {loading ? "Signing up..." : "Sign up"}
                 </button>
 
