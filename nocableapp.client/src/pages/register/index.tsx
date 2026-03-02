@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../api/authentication";
 import styles from "./register.module.css"
+import { useAuth } from "../../contexts/AuthProvider";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
+    const { register } = useAuth();
     const [input, setInput] = useState({
         email: "",
         password: "",
@@ -54,12 +55,12 @@ export default function RegisterPage() {
         }
 
         setLoading(true);
-        try {
-            await register(input.email, input.password);
-            navigate("/webapp", { replace: true });
-        } catch (err) {
-            setFetchError(err instanceof Error ? err.message : "Network error. Try again.");
+        const { error } = await register(input.email, input.password);
+        if (error) {
+            setFetchError(error);
             setLoading(false);
+        } else {
+            navigate("/webapp", { replace: true });
         }
     }
 

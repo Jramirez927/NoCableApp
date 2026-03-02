@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../api/authentication";
 import styles from "./login.module.css"
+import { useAuth } from "../../contexts/AuthProvider";
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [input, setInput] = useState({
         email: "",
         password: ""
@@ -41,13 +42,12 @@ export default function LoginPage() {
         }
 
         setLoading(true);
-        try {
-            await login(input.email, input.password);
-            navigate("/webapp", { replace: true });
-        } catch (err) {
-            const message = err instanceof Error ? err.message : "Network error. Try again.";
-            setError({ email: "", password: message });
+        const { error } = await login(input.email, input.password);
+        if (error) {
+            setError({ email: "", password: error });
             setLoading(false);
+        } else {
+            navigate("/webapp", { replace: true });
         }
     }
 
