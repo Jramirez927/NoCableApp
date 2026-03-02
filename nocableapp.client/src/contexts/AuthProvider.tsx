@@ -1,11 +1,11 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface User {
     email: string;
     [key: string]: unknown;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
     user: User | null;
     loading: boolean;
     checkAuth: () => Promise<void>;
@@ -22,7 +22,9 @@ export function useAuth() {
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
-
+    useEffect(() => {
+        checkAuth();
+    }, [])
     const checkAuth = async () => {
         try {
             const res = await fetch('/api/auth/me', { credentials: 'include'})

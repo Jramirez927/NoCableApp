@@ -43,7 +43,7 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await login(input.email, input.password);
-            navigate("/", { replace: true });
+            navigate("/webapp", { replace: true });
         } catch (err) {
             const message = err instanceof Error ? err.message : "Network error. Try again.";
             setError({ email: "", password: message });

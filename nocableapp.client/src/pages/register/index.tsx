@@ -56,7 +56,7 @@ export default function RegisterPage() {
         setLoading(true);
         try {
             await register(input.email, input.password);
-            navigate("/", { replace: true });
+            navigate("/webapp", { replace: true });
         } catch (err) {
             setFetchError(err instanceof Error ? err.message : "Network error. Try again.");
             setLoading(false);
