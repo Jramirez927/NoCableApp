@@ -11,5 +11,7 @@ namespace NoCableApp.Server.Data
         {
 
         }
+
+        public DbSet<JournalEntry> JournalEntries { get; set; }
     }
 }
