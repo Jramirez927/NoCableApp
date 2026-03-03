@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
     checkAuth as checkAuthApi,
     login as loginApi,
-    register as registerApi
+    register as registerApi,
+    logout as logoutApi
 } from "../api/authentication";
 
 interface User {
@@ -16,6 +17,7 @@ export interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<AuthResult>;
+    logout: () => Promise<AuthResult>;
     register: (email: string, password: string) => Promise<AuthResult>;
     checkAuth: () => Promise<void>;
 }
@@ -58,8 +60,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return result;
     }
 
+    const logout = async () => {
+        const result = await logoutApi();
+        if (!result.error) {
+            await checkAuth();
+        }
+        return result;
+    }
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, checkAuth }}>
+        <AuthContext.Provider value={{ user, loading, login, logout, register,  checkAuth }}>
             {children}
         </AuthContext.Provider>
     )
