@@ -37,3 +37,10 @@ export async function checkAuth() {
         return res.ok ? await res.json() : null;
     });
 }
+
+export async function logout() {
+    return safeFetch( async () => {
+        const res = await fetch('/api/auth/logout', { credentials: 'include' })
+        return res.ok? await res.json() : null;
+    })
+}
