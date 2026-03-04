@@ -1,11 +1,7 @@
 import React, { useRef, useState } from "react";
+import { searchPlaces, type NominatimResult } from "../../api/nominatim";
 
-export interface NominatimResult {
-    place_id: number;
-    display_name: string;
-    lat: string;
-    lon: string;
-}
+export type { NominatimResult };
 
 interface Props {
     onSelect: (result: NominatimResult) => void;
@@ -22,11 +18,8 @@ const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
         if (!value.trim()) { setResults([]); return; }
 
         debounceRef.current = setTimeout(async () => {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5`,
-                { headers: { "Accept-Language": "en" } }
-            );
-            const data: NominatimResult[] = await res.json();
+            const { data, error } = await searchPlaces(value);
+            if (error || !data) { console.error(error); return; }
             setResults(data);
         }, 400);
     };
@@ -68,6 +61,7 @@ const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
                                 padding: "8px 12px",
                                 cursor: "pointer",
                                 fontSize: "13px",
+                                color: "black",
                                 borderBottom: "1px solid #eee",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
