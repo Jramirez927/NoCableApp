@@ -1,9 +1,3 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
 
 .logo {
   will-change: filter;
@@ -31,10 +25,39 @@
   }
 }
 
+.btn {
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: rgba(255, 255, 255, 0.87);
+  text-align: center;
+}
+.btn:hover {
+  border-color: #646cff;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+@media (prefers-color-scheme: light) {
+  .btn {
+    background-color: #f9f9f9;
+    color: #213547;
+  }
+  .btn:hover {
+    color: #213547;
+  }
+}
+
 .card {
+  width: fit-content;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   gap: 1rem;
+  margin: 0 auto;
 }
 

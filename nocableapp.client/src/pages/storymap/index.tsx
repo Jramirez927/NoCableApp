@@ -90,21 +90,11 @@ const StoryMap: React.FC = () => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "#fff", borderBottom: "1px solid #ddd" }}>
-                <span style={{ fontSize: "14px", color: "#555" }}>Welcome {user?.email}</span>
+        <div style={{ display: "flex", flexDirection: "column", height: "100%" , width: "100%"}}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "#201040", borderBottom: "1px solid #ddd" }}>
                 <PlaceSearch onSelect={handlePlaceSelect} />
-                {selectedPlace && !showForm && (
-                    <button
-                        onClick={() => setShowForm(true)}
-                        style={{ padding: "8px 14px", background: "#e74c3c", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                    >
-                        Create Journal Entry Here
-                    </button>
-                )}
             </div>
-
-            <div ref={mapRef} style={{ flex: 1 }} />
+            <div ref={mapDivRef} style={{ width: "100%", height: "100%" }}></div>;
 
             {showForm && selectedPlace && (
                 <JournalEntryForm

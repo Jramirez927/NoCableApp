@@ -1,11 +1,14 @@
 /* login.module.css */
 
 .container {
-    min-width: 360px;
+    margin: 0 auto;
+    width: 360px;
+    align-self: center;
 }
 .form {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 .errorMessage {
     padding: 0px;
