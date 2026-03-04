@@ -4,7 +4,7 @@ import LoginPage from './pages/login'
 import RegisterPage from './pages/register/Register'
 import { JSX } from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
-import StoryMap from './pages/storymap'
+import StoryMap from './pages/storymap/Storymap'
 import MapProvider from './contexts/MapProvider'
 
 function App(): JSX.Element {
