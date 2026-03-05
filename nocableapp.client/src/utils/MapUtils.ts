@@ -12,6 +12,7 @@ import Style from 'ol/style/Style';
 import CircleStyle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
+import Icon from 'ol/style/Icon';
 import type { Coordinate } from 'ol/coordinate';
 import type { JournalEntry } from '../api/journalEntries';
 import 'ol/ol.css';
@@ -51,6 +52,74 @@ export class MapUtils {
                 radius,
                 fill: new Fill({ color }),
                 stroke: new Stroke({ color: '#fff', width: 2 }),
+            }),
+        });
+    }
+
+    /**
+     * Creates an Icon Style for the search pin marker using the Bootstrap pin-fill SVG.
+     */
+    static createPinIconStyle(color = '#2b09ee', scale = 2): Style {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="-2 -1 20 18">
+  <defs>
+    <filter id="pin-shadow" color-interpolation-filters="sRGB" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>
+      <feOffset dx="0" dy="1"></feOffset>
+      <feComponentTransfer result="offsetblur">
+        <feFuncA type="linear" slope="1"></feFuncA>
+      </feComponentTransfer>
+      <feFlood flood-color="rgba(0,0,0,0.3)"></feFlood>
+      <feComposite in2="offsetblur" operator="in"></feComposite>
+      <feMerge>
+        <feMergeNode></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="${color}" filter="url(#pin-shadow)" d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A6 6 0 0 1 5 6.708V2.277a3 3 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354"/>
+</svg>`;
+        return new Style({
+            image: new Icon({
+                src: `data:image/svg+xml;base64,${btoa(svg)}`,
+                scale,
+                anchor: [0.5, 1],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+            }),
+        });
+    }
+
+    /**
+     * Creates an Icon Style for journal entry markers using an inline SVG.
+     */
+    static createEntryStyle(color = '#e74c3c', scale = 1): Style {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="190.914 101.594 19.458 17.942">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="200.58" y1="103.572" x2="200.58" y2="118.905" id="gradient-0" gradientTransform="matrix(0.999798, 0.020119, -0.011403, 0.566677, 1.396501, 47.488833)">
+      <stop offset="0" style="stop-color: ${color}"></stop>
+      <stop offset="1" style="stop-color: color-mix(in srgb, ${color} 65%, black)"></stop>
+    </linearGradient>
+    <filter id="drop-shadow-filter-1" color-interpolation-filters="sRGB" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1"></feGaussianBlur>
+      <feOffset dx="0" dy="1"></feOffset>
+      <feComponentTransfer result="offsetblur">
+        <feFuncA type="linear" slope="1"></feFuncA>
+      </feComponentTransfer>
+      <feFlood flood-color="rgba(0,0,0,0.3)"></feFlood>
+      <feComposite in2="offsetblur" operator="in"></feComposite>
+      <feMerge>
+        <feMergeNode></feMergeNode>
+        <feMergeNode in="SourceGraphic"></feMergeNode>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="195.719" y="106.116" width="9.442" height="7.169" style="stroke-width: 0px; fill: rgb(255, 255, 255);"></rect>
+  <path d="M 194.58 103.572 C 193.475 103.572 192.58 104.467 192.58 105.572 L 192.58 113.572 C 192.58 114.676 193.475 115.572 194.58 115.572 L 197.08 115.572 C 197.394 115.572 197.691 115.72 197.88 115.972 L 199.78 118.505 C 199.969 118.757 200.265 118.905 200.58 118.905 C 200.894 118.905 201.191 118.757 201.38 118.505 L 203.28 115.972 C 203.469 115.72 203.765 115.572 204.08 115.572 L 206.58 115.572 C 207.684 115.572 208.58 114.676 208.58 113.572 L 208.58 105.572 C 208.58 104.467 207.684 103.572 206.58 103.572 L 194.58 103.572 Z M 200.58 107.565 C 202.244 105.854 206.405 108.848 200.58 112.697 C 194.755 108.847 198.916 105.854 200.58 107.565" style="fill-rule: nonzero; fill: url(#gradient-0); filter: url(#drop-shadow-filter-1);"></path>
+</svg>`;
+        return new Style({
+            image: new Icon({
+                src: `data:image/svg+xml;base64,${btoa(svg)}`,
+                scale,
             }),
         });
     }
