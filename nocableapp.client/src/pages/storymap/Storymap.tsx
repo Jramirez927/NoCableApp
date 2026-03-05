@@ -21,6 +21,7 @@ const entryStyle = MapUtils.createEntryStyle('#f3250e', 0.2);
 const StoryMap: React.FC = () => {
     const { map, mapDivRef } = useMap();
     const [selectedPlace, setSelectedPlace] = useState<NominatimResult | null>(null);
+    const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | undefined>();
     const [popupEntry, setPopupEntry] = useState<JournalEntry | null>(null);
     const pinSource = useRef(new VectorSource());
     const pinLayer = useRef(new VectorLayer({ source: pinSource.current, style: pinStyle }));
@@ -58,6 +59,7 @@ const StoryMap: React.FC = () => {
 
         navigator.geolocation?.getCurrentPosition(({ coords }) => {
             MapUtils.navigateToCoords(map, coords.longitude, coords.latitude, { zoom: 13 });
+            setUserLocation({ lat: coords.latitude, lon: coords.longitude });
         });
 
         const handleClick = (e: { pixel: [number, number] }) => {
@@ -116,7 +118,7 @@ const StoryMap: React.FC = () => {
         <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
             <div style={{ position: "relative", flex: 1, width: "100%" }}>
                 <div ref={mapDivRef} style={{ width: "100%", height: "100%" }} />
-                <LocationSearchToggle onSelect={handlePlaceSelect} />
+                <LocationSearchToggle onSelect={handlePlaceSelect} near={userLocation} />
                 <AddJournalEntryButton selectedPlace={selectedPlace} onSubmit={handleCreateEntry} />
                 </div>
             {createPortal(

@@ -3,9 +3,10 @@ import LocationSearch, { NominatimResult } from "../../components/LocationSearch
 
 interface Props {
     onSelect: (result: NominatimResult) => void;
+    near?: { lat: number; lon: number };
 }
 
-const LocationSearchToggle: React.FC<Props> = ({ onSelect }) => {
+const LocationSearchToggle: React.FC<Props> = ({ onSelect, near }) => {
     const [open, setOpen] = useState(false);
 
     const handleSelect = (result: NominatimResult) => {
@@ -22,7 +23,7 @@ const LocationSearchToggle: React.FC<Props> = ({ onSelect }) => {
             </div>
             {open && (
                 <div style={{ position: "absolute", top:"24px", left: "50%", transform: "translateX(-50%)", zIndex: 1000 }}>
-                    <LocationSearch onSelect={handleSelect} />
+                    <LocationSearch onSelect={handleSelect} near={near} />
                 </div>
             )}
         </>

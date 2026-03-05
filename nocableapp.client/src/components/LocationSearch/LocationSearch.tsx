@@ -6,9 +6,10 @@ export type { NominatimResult };
 
 interface Props {
     onSelect: (result: NominatimResult) => void;
+    near?: { lat: number; lon: number };
 }
 
-const LocationSearch: React.FC<Props> = ({ onSelect }) => {
+const LocationSearch: React.FC<Props> = ({ onSelect, near }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<NominatimResult[]>([]);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -19,7 +20,7 @@ const LocationSearch: React.FC<Props> = ({ onSelect }) => {
         if (!value.trim()) { setResults([]); return; }
 
         debounceRef.current = setTimeout(async () => {
-            const { data, error } = await searchPlaces(value);
+            const { data, error } = await searchPlaces(value, near);
             if (error || !data) { console.error(error); return; }
             setResults(data);
         }, 250);
@@ -38,6 +39,7 @@ const LocationSearch: React.FC<Props> = ({ onSelect }) => {
                 value={query}
                 onChange={e => search(e.target.value)}
                 placeholder="Search for a place..."
+                autoFocus
             />
             {results.length > 0 && (
                 <ul className={styles.dropdown}>

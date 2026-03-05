@@ -7,12 +7,15 @@ export interface NominatimResult {
     lon: string;
 }
 
-export function searchPlaces(query: string) {
+export function searchPlaces(query: string, near?: { lat: number; lon: number }) {
+    const params = new URLSearchParams({ q: query, format: "json", limit: "5" });
+    if (near) {
+        const delta = 2; // ~200km bias radius
+        params.set("viewbox", `${near.lon - delta},${near.lat + delta},${near.lon + delta},${near.lat - delta}`);
+        params.set("bounded", "0");
+    }
     return safeFetch<NominatimResult[]>(() =>
-        //TODO convert this to async await pattern
-        fetch(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5`,
-            { headers: { "Accept-Language": "en" } }
-        ).then(res => res.json())
+        fetch(`https://nominatim.openstreetmap.org/search?${params}`, { headers: { "Accept-Language": "en" } })
+            .then(res => res.json())
     );
 }
