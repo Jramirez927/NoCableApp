@@ -26,13 +26,8 @@ const StoryMap: React.FC = () => {
     const pinLayer = useRef(new VectorLayer({ source: pinSource.current, style: pinStyle }));
     const entriesSource = useRef(new VectorSource());
     const entriesLayer = useRef(new VectorLayer({ source: entriesSource.current, style: entryStyle }));
-    const popupEl = useRef((() => {
-        const el = document.createElement("div");
-        el.style.width = "320px";
-        el.style.display = "flex";
-        el.style.justifyContent = "center";
-        return el;
-    })());
+    const popupEl = useRef(document.createElement("div"));
+
     const overlayRef = useRef<Overlay | null>(null);
 
     const loadEntries = useCallback(async () => {
@@ -60,6 +55,10 @@ const StoryMap: React.FC = () => {
         map.addLayer(entriesLayer.current);
         map.addLayer(pinLayer.current);
         loadEntries();
+
+        navigator.geolocation?.getCurrentPosition(({ coords }) => {
+            MapUtils.navigateToCoords(map, coords.longitude, coords.latitude, { zoom: 13 });
+        });
 
         const handleClick = (e: { pixel: [number, number] }) => {
             const hit = map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
@@ -91,7 +90,7 @@ const StoryMap: React.FC = () => {
         setSelectedPlace(place);
         // navigate to point then add point feature
         const coords = fromLonLat([parseFloat(place.lon), parseFloat(place.lat)]);
-        map?.getView().animate({ center: coords, zoom: 20, duration: 800 }, () => {
+        MapUtils.navigateToCoords(map!, parseFloat(place.lon), parseFloat(place.lat), { zoom: 20 }, () => {
             pinSource.current.clear();
             pinSource.current.addFeature(new Feature(new Point(coords)));
         });
