@@ -1,33 +1,19 @@
-import React, { useState } from "react";
-import LocationSearch, { NominatimResult } from "../../components/LocationSearch/LocationSearch";
+import React from "react";
+import { Search } from "react-bootstrap-icons";
 
 interface Props {
-    onSelect: (result: NominatimResult) => void;
-    near?: { lat: number; lon: number };
+    open: boolean;
+    onToggle: () => void;
 }
 
-const LocationSearchToggle: React.FC<Props> = ({ onSelect, near }) => {
-    const [open, setOpen] = useState(false);
-
-    const handleSelect = (result: NominatimResult) => {
-        onSelect(result);
-        setOpen(false);
-    };
-
-    return (
-        <>
-            <div style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", zIndex: 1000 }}>
-                <button onClick={() => setOpen(prev => !prev)}>
-                    Search Location
-                </button>
-            </div>
-            {open && (
-                <div style={{ position: "absolute", top:"24px", left: "50%", transform: "translateX(-50%)", zIndex: 1000 }}>
-                    <LocationSearch onSelect={handleSelect} near={near} />
-                </div>
-            )}
-        </>
-    );
-};
+const LocationSearchToggle: React.FC<Props> = ({ open, onToggle }) => (
+    <button
+        onClick={onToggle}
+        title={open ? "Close Search" : "Search Location"}
+        style={{ padding: "8px 10px", ...(open ? { background: "#0d6efd", color: "white" } : {}) }}
+    >
+        <Search size={22} />
+    </button>
+);
 
 export default LocationSearchToggle;

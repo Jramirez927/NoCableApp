@@ -19,3 +19,11 @@ export function searchPlaces(query: string, near?: { lat: number; lon: number })
             .then(res => res.json())
     );
 }
+
+export function reverseGeocode(lat: number, lon: number) {
+    const params = new URLSearchParams({ lat: String(lat), lon: String(lon), format: "json" });
+    return safeFetch<NominatimResult>(() =>
+        fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, { headers: { "Accept-Language": "en" } })
+            .then(res => res.json())
+    );
+}

@@ -6,12 +6,15 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
-import { NominatimResult } from "../../components/LocationSearch/LocationSearch";
+import LocationSearch, { NominatimResult } from "../../components/LocationSearch/LocationSearch";
 import LocationSearchToggle from "./LocationSearchToggle";
 import AddJournalEntryButton from "./AddJournalEntryButton";
+import JournalEntryForm from "./JournalEntryForm";
+import PinDropButton from "./PinDropButton";
 import { createJournalEntry, getJournalEntries, JournalEntry } from "../../api/journalEntries";
+import { reverseGeocode } from "../../api/nominatim";
 import { useMap } from "../../contexts/MapProvider";
-import { fromLonLat } from "ol/proj";
+import { fromLonLat, toLonLat } from "ol/proj";
 import JournalEntryPopup from "./JournalEntryPopup";
 
 const pinStyle = MapUtils.createPinIconStyle();
@@ -23,6 +26,10 @@ const StoryMap: React.FC = () => {
     const [selectedPlace, setSelectedPlace] = useState<NominatimResult | null>(null);
     const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | undefined>();
     const [popupEntry, setPopupEntry] = useState<JournalEntry | null>(null);
+    const [placementMode, setPlacementMode] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [journalFormOpen, setJournalFormOpen] = useState(false);
+    const placementModeRef = useRef(false);
     const pinSource = useRef(new VectorSource());
     const pinLayer = useRef(new VectorLayer({ source: pinSource.current, style: pinStyle }));
     const entriesSource = useRef(new VectorSource());
@@ -62,7 +69,18 @@ const StoryMap: React.FC = () => {
             setUserLocation({ lat: coords.latitude, lon: coords.longitude });
         });
 
-        const handleClick = (e: { pixel: [number, number] }) => {
+        const handleClick = async (e: { pixel: [number, number] }) => {
+            if (placementModeRef.current && pinSource.current.getFeatures().length === 0) {
+                const coord = map.getCoordinateFromPixel(e.pixel);
+                const [lon, lat] = toLonLat(coord);
+                const { data } = await reverseGeocode(lat, lon);
+                if (data) {
+                    handlePlaceSelect(data);
+                    map.getTargetElement().style.cursor = "";
+                }
+                return;
+            }
+
             const hit = map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
                 if (layer === entriesLayer.current) {
                     const entry = feature.getProperties() as JournalEntry;
@@ -88,9 +106,25 @@ const StoryMap: React.FC = () => {
     }, [map, loadEntries]);
 
 
+    const handlePinDropToggle = () => {
+        if (placementModeRef.current) {
+            placementModeRef.current = false;
+            setPlacementMode(false);
+            setSelectedPlace(null);
+            pinSource.current.clear();
+            map!.getTargetElement().style.cursor = "";
+        } else {
+            placementModeRef.current = true;
+            setPlacementMode(true);
+            map!.getTargetElement().style.cursor = "crosshair";
+        }
+    };
+
     const handlePlaceSelect = (place: NominatimResult) => {
+        placementModeRef.current = true;
+        setPlacementMode(true);
         setSelectedPlace(place);
-        // navigate to point then add point feature
+        setSearchOpen(false);
         const coords = fromLonLat([parseFloat(place.lon), parseFloat(place.lat)]);
         MapUtils.navigateToCoords(map!, parseFloat(place.lon), parseFloat(place.lat), { zoom: 20 }, () => {
             pinSource.current.clear();
@@ -111,6 +145,7 @@ const StoryMap: React.FC = () => {
         });
 
         setSelectedPlace(null);
+        setJournalFormOpen(false);
         loadEntries();
     };
 
@@ -118,8 +153,25 @@ const StoryMap: React.FC = () => {
         <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
             <div style={{ position: "relative", flex: 1, width: "100%" }}>
                 <div ref={mapDivRef} style={{ width: "100%", height: "100%" }} />
-                <LocationSearchToggle onSelect={handlePlaceSelect} near={userLocation} />
-                <AddJournalEntryButton selectedPlace={selectedPlace} onSubmit={handleCreateEntry} />
+                {searchOpen && (
+                    <div style={{ position: "absolute", top: "55%", left: "50%", transform: "translateX(-50%)", zIndex: 1000 }}>
+                        <LocationSearch onSelect={handlePlaceSelect} near={userLocation} />
+                    </div>
+                )}
+                {journalFormOpen && selectedPlace && (
+                    <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 1001 }}>
+                        <JournalEntryForm
+                            placeName={selectedPlace.display_name}
+                            onSubmit={handleCreateEntry}
+                            onCancel={() => setJournalFormOpen(false)}
+                        />
+                    </div>
+                )}
+                <div style={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 8, zIndex: 1000 }}>
+                    <LocationSearchToggle open={searchOpen} onToggle={() => setSearchOpen(p => !p)} />
+                    {selectedPlace && <AddJournalEntryButton open={journalFormOpen} onToggle={() => setJournalFormOpen(p => !p)} />}
+                    <PinDropButton active={placementMode} onClick={handlePinDropToggle} />
+                </div>
                 </div>
             {createPortal(
                 popupEntry && (
