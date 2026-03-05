@@ -191,12 +191,12 @@ export class MapUtils {
     /**
      * Animates the map view to center on the provided [lon, lat] coordinate.
      */
-    static animateTo(map: OLMap, lon: number, lat: number, options: AnimateOptions = {}): void {
+    static navigateToCoords(map: OLMap, lon: number, lat: number, options: AnimateOptions = {}, onComplete?: () => void): void {
         const { zoom = 14, duration = 800 } = options;
-        map.getView().animate({
-            center: fromLonLat([lon, lat]),
-            zoom,
-            duration,
-        });
+        if (onComplete) {
+            map.getView().animate({ center: fromLonLat([lon, lat]), zoom, duration }, onComplete);
+        } else {
+            map.getView().animate({ center: fromLonLat([lon, lat]), zoom, duration });
+        }
     }
 }
