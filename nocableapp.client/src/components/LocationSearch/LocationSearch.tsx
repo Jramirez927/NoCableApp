@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { searchPlaces, type NominatimResult } from "../../api/nominatim";
+import styles from "./LocationSearch.module.css";
 
 export type { NominatimResult };
 
@@ -7,7 +8,7 @@ interface Props {
     onSelect: (result: NominatimResult) => void;
 }
 
-const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
+const LocationSearch: React.FC<Props> = ({ onSelect }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<NominatimResult[]>([]);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -21,7 +22,7 @@ const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
             const { data, error } = await searchPlaces(value);
             if (error || !data) { console.error(error); return; }
             setResults(data);
-        }, 400);
+        }, 250);
     };
 
     const handleSelect = (result: NominatimResult) => {
@@ -31,44 +32,20 @@ const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
     };
 
     return (
-        <div style={{ position: "relative" }}>
+        <div className={styles.wrapper}>
             <input
+                className={styles.input}
                 value={query}
                 onChange={e => search(e.target.value)}
                 placeholder="Search for a place..."
-                style={{ width: "300px", padding: "8px", fontSize: "14px" }}
             />
             {results.length > 0 && (
-                <ul style={{
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    width: "400px",
-                    background: "#fff",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    listStyle: "none",
-                    margin: 0,
-                    padding: 0,
-                    zIndex: 1000,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                }}>
+                <ul className={styles.dropdown}>
                     {results.map(r => (
                         <li
                             key={r.place_id}
+                            className={styles.option}
                             onClick={() => handleSelect(r)}
-                            style={{
-                                padding: "8px 12px",
-                                cursor: "pointer",
-                                fontSize: "13px",
-                                color: "black",
-                                borderBottom: "1px solid #eee",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                            }}
-                            onMouseEnter={e => (e.currentTarget.style.background = "#f5f5f5")}
-                            onMouseLeave={e => (e.currentTarget.style.background = "#fff")}
                         >
                             {r.display_name}
                         </li>
@@ -79,4 +56,4 @@ const PlaceSearch: React.FC<Props> = ({ onSelect }) => {
     );
 };
 
-export default PlaceSearch;
+export default LocationSearch;

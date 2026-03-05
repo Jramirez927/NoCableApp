@@ -4,8 +4,7 @@ import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
-import PlaceSearch, { NominatimResult } from "./PlaceSearch";
-import JournalEntryForm from "./JournalEntryForm";
+import { NominatimResult } from "../../components/LocationSearch/LocationSearch";
 import { createJournalEntry, getJournalEntries } from "../../api/journalEntries";
 import { useMap } from "../../contexts/MapProvider";
 import { fromLonLat } from "ol/proj";
@@ -21,7 +20,6 @@ const pinStyle = new Style({
 const StoryMap: React.FC = () => {
     const { map, mapDivRef } = useMap();
     const [selectedPlace, setSelectedPlace] = useState<NominatimResult | null>(null);
-    const [showForm, setShowForm] = useState(true);
     const pinSource = useRef(new VectorSource());
     const pinLayer = useRef(new VectorLayer({ source: pinSource.current, style: pinStyle }));
 
@@ -34,7 +32,6 @@ const StoryMap: React.FC = () => {
     const loadEntries = useCallback(async () => {
         const { data } = await getJournalEntries();
         if (!data) return;
-
     }, []);
 
 
@@ -60,25 +57,15 @@ const StoryMap: React.FC = () => {
             dateVisited: formData.dateVisited,
         });
 
-        setShowForm(false);
         setSelectedPlace(null);
         loadEntries();
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100%" , width: "100%"}}>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px", background: "#201040", borderBottom: "1px solid #ddd" }}>
-                <PlaceSearch onSelect={handlePlaceSelect} />
-            </div>
-            <div ref={mapDivRef} style={{ width: "100%", height: "100%" }}></div>;
-
-            {showForm && selectedPlace && (
-                <JournalEntryForm
-                    place={selectedPlace}
-                    onSubmit={handleCreateEntry}
-                    onCancel={() => setShowForm(false)}
-                />
-            )}
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
+            <div style={{ position: "relative", flex: 1, width: "100%" }}>
+                <div ref={mapDivRef} style={{ width: "100%", height: "100%" }} />
+                </div>
         </div>
     );
 };
