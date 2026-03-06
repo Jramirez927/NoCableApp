@@ -51,49 +51,39 @@ const StoryMap: React.FC = () => {
     new VectorLayer({ source: pinSource.current, style: pinStyle }),
   );
 
-  const entriesSource = useRef(new VectorSource());
-  const entriesLayer = useRef(
-    new VectorLayer({ source: entriesSource.current, style: entryStyle }),
+  const journalEntriesSource = useRef(new VectorSource());
+  const journalEntriesLayer = useRef(
+    new VectorLayer({
+      source: journalEntriesSource.current,
+      style: entryStyle,
+    }),
   );
-  const popupEl = useRef(document.createElement("div"));
-  const formPopupEl = useRef(document.createElement("div"));
-
-  const popupOverlayRef = useRef<Overlay | null>(null);
-  const formOverlayRef = useRef<Overlay | null>(null);
+  const overlayEl = useRef(document.createElement("div"));
+  const overlayRef = useRef<Overlay | null>(null);
 
   const loadEntries = useCallback(async () => {
     const { data } = await getJournalEntries();
     if (!data) return;
-    entriesSource.current.clear();
+    journalEntriesSource.current.clear();
     data.forEach((entry) => {
       const feature = new Feature(
         new Point(fromLonLat([entry.longitude, entry.latitude])),
       );
       feature.setProperties(entry);
-      entriesSource.current.addFeature(feature);
+      journalEntriesSource.current.addFeature(feature);
     });
   }, []);
 
   useEffect(() => {
     if (!map) return;
-
     const overlay = new Overlay({
-      element: popupEl.current,
+      element: overlayEl.current,
       positioning: "bottom-center",
       stopEvent: true,
     });
     map.addOverlay(overlay);
-    popupOverlayRef.current = overlay;
-
-    const formOverlay = new Overlay({
-      element: formPopupEl.current,
-      positioning: "bottom-center",
-      stopEvent: true,
-    });
-    map.addOverlay(formOverlay);
-    formOverlayRef.current = formOverlay;
-
-    map.addLayer(entriesLayer.current);
+    overlayRef.current = overlay;
+    map.addLayer(journalEntriesLayer.current);
     map.addLayer(pinLayer.current);
     loadEntries();
 
@@ -120,9 +110,10 @@ const StoryMap: React.FC = () => {
       }
 
       const hit = map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
-        if (layer === entriesLayer.current) {
+        if (layer === journalEntriesLayer.current) {
           const entry = feature.getProperties() as JournalEntry;
           const coord = (feature.getGeometry() as Point).getCoordinates();
+          setJournalFormOpen(false);
           overlay.setPosition(coord);
           setPopupEntryView(entry);
           return true;
@@ -138,20 +129,23 @@ const StoryMap: React.FC = () => {
     return () => {
       map.un("click", handleClick as never);
       map.removeOverlay(overlay);
-      map.removeOverlay(formOverlay);
-      map.removeLayer(entriesLayer.current);
+      map.removeLayer(journalEntriesLayer.current);
       map.removeLayer(pinLayer.current);
     };
   }, [map, loadEntries]);
 
-  useEffect(() => {
-    if (!formOverlayRef.current || !selectedPlace) return;
+  const handleJournalFormToggle = () => {
     if (journalFormOpen) {
-      formOverlayRef.current.setPosition(placeCoords(selectedPlace));
+      overlayRef.current?.setPosition(undefined);
+      setJournalFormOpen(false);
     } else {
-      formOverlayRef.current.setPosition(undefined);
+      if (selectedPlace) {
+        setPopupEntryView(null);
+        overlayRef.current?.setPosition(placeCoords(selectedPlace));
+      }
+      setJournalFormOpen(true);
     }
-  }, [journalFormOpen, selectedPlace]);
+  };
 
   const handlePinDropToggle = () => {
     if (placementModeRef.current) {
@@ -203,6 +197,7 @@ const StoryMap: React.FC = () => {
     map!.getTargetElement().style.cursor = "";
     setSelectedPlace(null);
     pinSource.current.clear();
+    overlayRef.current?.setPosition(undefined);
     setJournalFormOpen(false);
     loadEntries();
   };
@@ -249,36 +244,36 @@ const StoryMap: React.FC = () => {
           {selectedPlace && (
             <AddJournalEntryButton
               open={journalFormOpen}
-              onToggle={() => setJournalFormOpen((p) => !p)}
+              onToggle={handleJournalFormToggle}
             />
           )}
           <PinDropButton
             active={!!selectedPlace}
             onClick={handlePinDropToggle}
+            pinLayerSource={pinSource.current}
           />
         </div>
       </div>
-      {createPortal(
-        popupEntryView && (
-          <JournalEntryPopup
-            entry={popupEntryView}
-            onClose={() => {
-              popupOverlayRef.current?.setPosition(undefined);
-              setPopupEntryView(null);
-            }}
-          />
-        ),
-        popupEl.current,
-      )}
       {createPortal(
         journalFormOpen && selectedPlace ? (
           <JournalEntryForm
             placeName={selectedPlace.display_name}
             onSubmit={handleCreateEntry}
-            onCancel={() => setJournalFormOpen(false)}
+            onCancel={() => {
+              overlayRef.current?.setPosition(undefined);
+              setJournalFormOpen(false);
+            }}
+          />
+        ) : popupEntryView ? (
+          <JournalEntryPopup
+            entry={popupEntryView}
+            onClose={() => {
+              overlayRef.current?.setPosition(undefined);
+              setPopupEntryView(null);
+            }}
           />
         ) : null,
-        formPopupEl.current,
+        overlayEl.current,
       )}
     </div>
   );

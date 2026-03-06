@@ -6,17 +6,23 @@ import { JSX } from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
 import StoryMap from './pages/storymap/Storymap'
 import MapProvider from './contexts/MapProvider'
+import AppNavbar from './components/AppNavbar/AppNavbar'
 
 function App(): JSX.Element {
 
   return (
-      <Routes>
-        <Route index  element={<Home />} />
-        <Route path="register" element={<RegisterPage/>} />
-        <Route path="login" element={<LoginPage/>} />
-        <Route path="webapp" element={<ProtectedRoute children={<MapProvider><StoryMap/></MapProvider>}/>} />
-        <Route path="*" element={<h1>404 Not Found</h1>} />
-      </Routes>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+      <AppNavbar />
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="register" element={<RegisterPage/>} />
+          <Route path="login" element={<LoginPage/>} />
+          <Route path="webapp" element={<ProtectedRoute children={<MapProvider><StoryMap/></MapProvider>}/>} />
+          <Route path="*" element={<h1>404 Not Found</h1>} />
+        </Routes>
+      </div>
+    </div>
   )
 }
 

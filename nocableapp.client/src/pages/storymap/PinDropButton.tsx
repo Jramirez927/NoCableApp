@@ -1,8 +1,10 @@
+import VectorSource from "ol/source/Vector";
 import React from "react";
 import { GeoAltFill } from "react-bootstrap-icons";
 
 interface Props {
     active: boolean;
+    pinLayerSource: VectorSource
     onClick: () => void;
 }
 
