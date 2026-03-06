@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <div className="card">
+    <div className="container">
       <h1 className="logo react">No-Cable.com</h1>
 
       <Link to="/register" className="btn">Register</Link>
