@@ -195,12 +195,12 @@ export class MapUtils {
     /**
      * Animates the map view to center on the provided [lon, lat] coordinate.
      */
-    static navigateToCoords(map: OLMap, lon: number, lat: number, options: AnimateOptions = {}, onComplete?: () => void): void {
+    static navigateToCoords(map: OLMap, coords: Coordinate, options: AnimateOptions = {}, onComplete?: () => void): void {
         const { zoom = 14, duration = 800 } = options;
         if (onComplete) {
-            map.getView().animate({ center: fromLonLat([lon, lat]), zoom, duration }, onComplete);
+            map.getView().animate({ center: coords, zoom, duration }, onComplete);
         } else {
-            map.getView().animate({ center: fromLonLat([lon, lat]), zoom, duration });
+            map.getView().animate({ center: coords, zoom, duration });
         }
     }
 }
