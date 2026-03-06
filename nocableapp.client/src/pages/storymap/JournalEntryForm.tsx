@@ -17,6 +17,7 @@ const JournalEntryForm: React.FC<Props> = ({ placeName, onSubmit, onCancel }) =>
     };
 
     return (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <form onSubmit={handleSubmit} style={{
             background: "#fff",
             border: "1px solid #ccc",
@@ -58,6 +59,8 @@ const JournalEntryForm: React.FC<Props> = ({ placeName, onSubmit, onCancel }) =>
                 <button type="submit">Save Entry</button>
             </div>
         </form>
+        <i className="bi bi-caret-down-fill" style={{ color: "#fff", fontSize: "20px", marginTop: "-6px", lineHeight: 1 }} />
+        </div>
     );
 };
 
