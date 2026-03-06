@@ -13,7 +13,7 @@ function App(): JSX.Element {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       <AppNavbar />
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+      <div style={{ display: "flex", height:"100%", overflowY: 'auto' }}>
         <Routes>
           <Route index element={<Home />} />
           <Route path="register" element={<RegisterPage/>} />
