@@ -1,6 +1,6 @@
 import Home from './pages/home'
 import { Routes, Route } from 'react-router-dom'
-import LoginPage from './pages/login'
+import LoginPage from './pages/login/Login'
 import RegisterPage from './pages/register/Register'
 import { JSX } from 'react'
 import ProtectedRoute from './components/ProtectedRoute'
