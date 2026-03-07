@@ -13,7 +13,7 @@ import LocationSearch, {
 import LocationSearchToggle from "./LocationSearchToggle";
 import AddJournalEntryButton from "./AddJournalEntryButton";
 import JournalEntryForm from "./JournalEntryForm";
-import AddPinButton from "./PinDropButton";
+import AddPinButton from "./AddPinButton";
 import {
   createJournalEntry,
   getJournalEntries,
