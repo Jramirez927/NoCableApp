@@ -219,6 +219,7 @@ const StoryMap: React.FC = () => {
           <AddPinButton
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
+            selectedPlaceLayer={selectedPlaceLayer.current}
           />
         </div>
       </div>

@@ -3,11 +3,15 @@ import { MapUtils } from "../../utils/MapUtils";
 import { useMap } from "../../contexts/MapProvider";
 import { useEffect, useState } from "react";
 import { Coordinate } from "ol/coordinate";
-//import { reverseGeocode } from "../../api/photon";
+import Translate from "ol/interaction/Translate";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
+import Point from "ol/geom/Point";
 
 interface Props {
   selectedPlace: Coordinate | null;
   setSelectedPlace: React.Dispatch<React.SetStateAction<Coordinate | null>>;
+  selectedPlaceLayer: VectorLayer<VectorSource>;
 }
 enum AddPinStatus {
   addingPin,
@@ -15,7 +19,7 @@ enum AddPinStatus {
   inactive,
 }
 
-function AddPinButton({ selectedPlace, setSelectedPlace }: Props) {
+function AddPinButton({ selectedPlace, setSelectedPlace, selectedPlaceLayer }: Props) {
   const { map } = useMap();
   const [toolStatus, setToolStatus] = useState<AddPinStatus>(
     AddPinStatus.inactive,
@@ -26,6 +30,45 @@ function AddPinButton({ selectedPlace, setSelectedPlace }: Props) {
       : toolStatus == AddPinStatus.addingPin
         ? "Drop Pin"
         : "Remove Pin";
+
+  // Drag existing pin to reposition
+  useEffect(() => {
+    if (!map || !selectedPlace) return;
+
+    const translate = new Translate({ layers: [selectedPlaceLayer] });
+    map.addInteraction(translate);
+
+    const handleTranslateStart = () => {
+      map.getTargetElement().style.cursor = "grabbing";
+    };
+
+    const handleTranslateEnd = () => {
+      const feature = selectedPlaceLayer.getSource()?.getFeatures()[0];
+      if (!feature) return;
+      const coord = (feature.getGeometry() as Point).getCoordinates();
+      map.getTargetElement().style.cursor = "grab";
+      setSelectedPlace(coord);
+    };
+
+    const handlePointerMove = (e: any) => {
+      if (map.getTargetElement().style.cursor === "grabbing") return;
+      const hit = map.hasFeatureAtPixel(e.pixel, {
+        layerFilter: (l) => l === selectedPlaceLayer,
+      });
+      map.getTargetElement().style.cursor = hit ? "grab" : "";
+    };
+
+    translate.on("translatestart", handleTranslateStart as never);
+    translate.on("translateend", handleTranslateEnd as never);
+    map.on("pointermove", handlePointerMove as never);
+
+    return () => {
+      map.removeInteraction(translate);
+      map.un("pointermove", handlePointerMove as never);
+      map.getTargetElement().style.cursor = "";
+    };
+  }, [map, selectedPlace, selectedPlaceLayer]);
+
   useEffect(() => {
     if (selectedPlace && toolStatus === AddPinStatus.inactive) {
       setToolStatus(AddPinStatus.clearingPin);
