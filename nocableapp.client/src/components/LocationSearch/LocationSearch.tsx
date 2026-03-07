@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { searchPlaces, type NominatimResult } from "../../api/nominatim";
+import { searchPlaces, type NominatimResult } from "../../api/photon";
 import styles from "./LocationSearch.module.css";
 
 export type { NominatimResult };

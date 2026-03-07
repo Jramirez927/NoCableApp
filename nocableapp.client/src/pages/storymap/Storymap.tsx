@@ -24,7 +24,7 @@ import { useMap } from "../../contexts/MapProvider";
 import { fromLonLat, toLonLat } from "ol/proj";
 import JournalEntryPopup from "./JournalEntryPopup";
 import { Coordinate } from "ol/coordinate";
-import { reverseGeocode } from "../../api/nominatim";
+import { reverseGeocode } from "../../api/photon";
 
 const pinStyle = MapUtils.createPinIconStyle();
 

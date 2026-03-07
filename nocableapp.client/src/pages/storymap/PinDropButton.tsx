@@ -3,7 +3,7 @@ import { MapUtils } from "../../utils/MapUtils";
 import { useMap } from "../../contexts/MapProvider";
 import { useEffect, useState } from "react";
 import { Coordinate } from "ol/coordinate";
-//import { reverseGeocode } from "../../api/nominatim";
+//import { reverseGeocode } from "../../api/photon";
 
 interface Props {
   selectedPlace: Coordinate | null;
