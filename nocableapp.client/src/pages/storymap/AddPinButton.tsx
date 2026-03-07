@@ -31,63 +31,65 @@ function AddPinButton({ selectedPlace, setSelectedPlace, selectedPlaceLayer }: P
         ? "Drop Pin"
         : "Remove Pin";
 
-  // Drag existing pin to reposition
   useEffect(() => {
-    if (!map || !selectedPlace) return;
-
-    const translate = new Translate({ layers: [selectedPlaceLayer] });
-    map.addInteraction(translate);
-
-    const handleTranslateStart = () => {
-      map.getTargetElement().style.cursor = "grabbing";
-    };
-
-    const handleTranslateEnd = () => {
-      const feature = selectedPlaceLayer.getSource()?.getFeatures()[0];
-      if (!feature) return;
-      const coord = (feature.getGeometry() as Point).getCoordinates();
-      map.getTargetElement().style.cursor = "grab";
-      setSelectedPlace(coord);
-    };
-
-    const handlePointerMove = (e: any) => {
-      if (map.getTargetElement().style.cursor === "grabbing") return;
-      const hit = map.hasFeatureAtPixel(e.pixel, {
-        layerFilter: (l) => l === selectedPlaceLayer,
-      });
-      map.getTargetElement().style.cursor = hit ? "grab" : "";
-    };
-
-    translate.on("translatestart", handleTranslateStart as never);
-    translate.on("translateend", handleTranslateEnd as never);
-    map.on("pointermove", handlePointerMove as never);
-
-    return () => {
-      map.removeInteraction(translate);
-      map.un("pointermove", handlePointerMove as never);
-      map.getTargetElement().style.cursor = "";
-    };
-  }, [map, selectedPlace, selectedPlaceLayer]);
-
-  useEffect(() => {
+    // Sync status when pin is placed externally (e.g. via location search)
     if (selectedPlace && toolStatus === AddPinStatus.inactive) {
       setToolStatus(AddPinStatus.clearingPin);
       return;
     }
-    if (!map || toolStatus !== AddPinStatus.addingPin) return;
+    // Reset status when pin is cleared externally (e.g. after journal entry created)
+    if (!selectedPlace && toolStatus === AddPinStatus.clearingPin) {
+      setToolStatus(AddPinStatus.inactive);
+      return;
+    }
+    if (!map) return;
 
-    const handleMapClick = async (e: { pixel: [number, number] }) => {
-      const coord = map.getCoordinateFromPixel(e.pixel);
-      setSelectedPlace(coord);
-      setToolStatus(AddPinStatus.clearingPin);
-      map.getTargetElement().style.cursor = "";
-    };
+    // Click-to-place handler while in addingPin mode
+    if (toolStatus === AddPinStatus.addingPin) {
+      const handleMapClick = (e: { pixel: [number, number] }) => {
+        const coord = map.getCoordinateFromPixel(e.pixel);
+        setSelectedPlace(coord);
+        setToolStatus(AddPinStatus.clearingPin);
+        map.getTargetElement().style.cursor = "";
+      };
+      map.on("click", handleMapClick as never);
+      return () => map.un("click", handleMapClick as never);
+    }
 
-    map.on("click", handleMapClick as never);
-    return () => {
-      map.un("click", handleMapClick as never);
-    };
-  }, [map, toolStatus, selectedPlace]);
+    // Drag-to-reposition when pin is placed
+    if (selectedPlace) {
+      const translate = new Translate({ layers: [selectedPlaceLayer] });
+      map.addInteraction(translate);
+
+      const handleTranslateStart = () => {
+        map.getTargetElement().style.cursor = "grabbing";
+      };
+      const handleTranslateEnd = () => {
+        const feature = selectedPlaceLayer.getSource()?.getFeatures()[0];
+        if (!feature) return;
+        const coord = (feature.getGeometry() as Point).getCoordinates();
+        map.getTargetElement().style.cursor = "grab";
+        setSelectedPlace(coord);
+      };
+      const handlePointerMove = (e: any) => {
+        if (map.getTargetElement().style.cursor === "grabbing") return;
+        const hit = map.hasFeatureAtPixel(e.pixel, {
+          layerFilter: (l) => l === selectedPlaceLayer,
+        });
+        map.getTargetElement().style.cursor = hit ? "grab" : "";
+      };
+
+      translate.on("translatestart", handleTranslateStart as never);
+      translate.on("translateend", handleTranslateEnd as never);
+      map.on("pointermove", handlePointerMove as never);
+
+      return () => {
+        map.removeInteraction(translate);
+        map.un("pointermove", handlePointerMove as never);
+        map.getTargetElement().style.cursor = "";
+      };
+    }
+  }, [map, selectedPlace, selectedPlaceLayer, toolStatus]);
   const handlePinDropToggle = () => {
     // if place is set on map clear it
 
