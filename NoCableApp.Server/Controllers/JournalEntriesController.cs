@@ -78,4 +78,22 @@ public class JournalEntriesController : ControllerBase
             entry.CreatedAt
         });
     }
+
+    // DELETE api/journalentries/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = _userManager.GetUserId(User);
+
+        var entry = await _db.JournalEntries
+            .FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId);
+
+        if (entry is null)
+            return NotFound();
+
+        _db.JournalEntries.Remove(entry);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

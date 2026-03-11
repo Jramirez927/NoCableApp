@@ -28,6 +28,16 @@ export async function getJournalEntries() {
     });
 }
 
+export async function deleteJournalEntry(id: number) {
+    return safeFetch<void>(async () => {
+        const res = await fetch(`/api/journalentries/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to delete journal entry.");
+    });
+}
+
 export async function createJournalEntry(payload: JournalEntryPayload) {
     return safeFetch<JournalEntry>(async () => {
         const res = await fetch("/api/journalentries", {
