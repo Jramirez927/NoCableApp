@@ -5,9 +5,10 @@ import { JournalEntry } from "../../api/journalEntries";
 interface Props {
   entry: JournalEntry;
   onClose: () => void;
+  onDelete: (id: number) => void;
 }
 
-const JournalEntryPopup: React.FC<Props> = ({ entry, onClose }) => {
+const JournalEntryPopup: React.FC<Props> = ({ entry, onClose, onDelete }) => {
   const [placeExpanded, setPlaceExpanded] = useState(false);
   const dateVisited = new Date(entry.dateVisited).toLocaleDateString(
     undefined,
@@ -41,7 +42,7 @@ const JournalEntryPopup: React.FC<Props> = ({ entry, onClose }) => {
           </Card.Text>
           <Stack direction="horizontal" className="justify-content-between align-items-center">
             <small className="text-muted">{dateVisited}</small>
-            <Button href="#" variant="light" size="sm" style={{ padding: "4px 6px" }}><i className="bi bi-trash3"></i></Button>
+            <Button variant="light" size="sm" style={{ padding: "4px 6px" }} onClick={() => onDelete(entry.id)}><i className="bi bi-trash3"></i></Button>
           </Stack>
         </Card.Body>
       </Card>

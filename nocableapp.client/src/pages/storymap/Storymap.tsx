@@ -16,6 +16,7 @@ import JournalEntryForm from "./JournalEntryForm";
 import AddPinButton from "./AddPinButton";
 import {
   createJournalEntry,
+  deleteJournalEntry,
   getJournalEntries,
   JournalEntry,
 } from "../../api/journalEntries";
@@ -193,6 +194,14 @@ const StoryMap: React.FC = () => {
     if (data) setJournalEntries((prev) => [...prev, data]);
   };
 
+  const handleDeleteEntry = async (journalEntryId: number) => {
+    const { error } = await deleteJournalEntry(journalEntryId);
+    if (!error) {
+      setJournalEntries((prev) => prev.filter((e) => e.id !== journalEntryId));
+      setSelectedJournalEntry(null);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.mapWrapper}>
@@ -240,6 +249,7 @@ const StoryMap: React.FC = () => {
               popupOverlayRef.current?.setPosition(undefined);
               setSelectedJournalEntry(null);
             }}
+            onDelete={handleDeleteEntry}
           />
         ) : null,
         popupOverlayEl.current,
