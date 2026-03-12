@@ -18,7 +18,7 @@ export interface AuthContextType {
     loading: boolean;
     login: (email: string, password: string) => Promise<AuthResult>;
     logout: () => Promise<AuthResult>;
-    register: (email: string, password: string) => Promise<AuthResult>;
+    register: (userName: string, email: string, password: string) => Promise<AuthResult>;
     checkAuth: () => Promise<void>;
 }
 
@@ -52,8 +52,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return result;
     }
 
-    const register = async (email: string, password: string): Promise<AuthResult> => {
-        const result = await registerApi(email, password);
+    const register = async (userName: string, email: string, password: string): Promise<AuthResult> => {
+        const result = await registerApi(userName, email, password);
         if (!result.error) {
             await checkAuth();
         }

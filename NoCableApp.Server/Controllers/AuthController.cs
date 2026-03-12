@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var user = new NoCableUser { UserName = request.Email, Email = request.Email };
+        var user = new NoCableUser { UserName = request.UserName, Email = request.Email };
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)

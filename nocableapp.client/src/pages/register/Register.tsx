@@ -7,11 +7,13 @@ export default function RegisterPage() {
     const navigate = useNavigate();
     const { register } = useAuth();
     const [input, setInput] = useState({
+        userName: "",
         email: "",
         password: "",
         confirmPassword: ""
     })
     const [error, setError] = useState({
+        userName: "",
         email: "",
         password: "",
         confirmPassword: ""
@@ -20,8 +22,9 @@ export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    function validate(): { email: string; password: string; confirmPassword: string } {
-        const errors = { email: "", password: "", confirmPassword: "" }
+    function validate(): { userName: string; email: string; password: string; confirmPassword: string } {
+        const errors = { userName: "", email: "", password: "", confirmPassword: "" }
+        if (!input.userName) errors.userName = "Username is required.";
         if (!input.email) errors.email = "Email is required.";
         // simple email check
         else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = "Enter a valid email.";
@@ -44,18 +47,19 @@ export default function RegisterPage() {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setError({
+            userName: "",
             email: "",
             password: "",
             confirmPassword: ""
         });
         const v = validate();
-        if (v.email || v.password || v.confirmPassword) {
+        if (v.userName || v.email || v.password || v.confirmPassword) {
             setError(v);
             return;
         }
 
         setLoading(true);
-        const { error } = await register(input.email, input.password);
+        const { error } = await register(input.userName, input.email, input.password);
         if (error) {
             setFetchError(error);
             setLoading(false);
@@ -69,6 +73,17 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} aria-label="Register form" className={styles.form}>
                 <h1>Register</h1>
                 {fetchError && <div className={styles.errorMessage} role="alert">{fetchError}</div>}
+                {error.userName && <div className={styles.errorMessage} role="alert">{error.userName}</div>}
+
+                <label className={styles.emailLabel}>
+                    <input
+                        type="text"
+                        value={input.userName}
+                        onChange={(e) => setInput({ ...input, userName: e.target.value })}
+                        required
+                        placeholder="Username"
+                    />
+                </label>
                 {error.email && <div className={styles.errorMessage} role="alert">{error.email}</div>}
 
                 <label className={styles.emailLabel}>
