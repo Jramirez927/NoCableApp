@@ -24,6 +24,10 @@ import {
 import { useMap } from "../../contexts/MapProvider";
 import { fromLonLat, toLonLat } from "ol/proj";
 import JournalEntryPopup from "./JournalEntryPopup";
+import StorymapSidebar from "./StorymapSidebar";
+import StorymapIconNavbar from "./StorymapIconNavbar";
+import StorymapFeedPanel from "./StorymapFeedPanel";
+import StorymapFriendsPanel from "./StorymapFriendsPanel";
 import { Coordinate } from "ol/coordinate";
 import { reverseGeocode } from "../../api/photon";
 
@@ -40,6 +44,7 @@ const StoryMap: React.FC = () => {
     useState<JournalEntry | null>(null);
   const [locationSearchOpen, setLocationSearchOpen] = useState(false);
   const [journalFormOpen, setJournalFormOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<"entries" | "feed" | "friends" | null>(null);
 
   const [selectedPlace, setSelectedPlace] = useState<Coordinate | null>(null);
   const [selectedPlaceName, setSelectedPlaceName] = useState<string>("");
@@ -232,6 +237,22 @@ const StoryMap: React.FC = () => {
           />
         </div>
       </div>
+      {activePanel === "friends" && (
+        <div className={styles.sidePanel}>
+          <StorymapFriendsPanel />
+        </div>
+      )}
+      {activePanel === "feed" && (
+        <div className={styles.sidePanel}>
+          <StorymapFeedPanel />
+        </div>
+      )}
+      {activePanel === "entries" && (
+        <div className={styles.sidePanel}>
+          <StorymapSidebar entries={journalEntries} />
+        </div>
+      )}
+      <StorymapIconNavbar activePanel={activePanel} onToggle={setActivePanel} />
       {createPortal(
         journalFormOpen && selectedPlace ? (
           <JournalEntryForm
