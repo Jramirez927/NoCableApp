@@ -38,6 +38,20 @@ export async function checkAuth() {
     });
 }
 
+export async function changeUsername(newUserName: string) {
+    return safeFetch(async () => {
+        const res = await fetch("/api/auth/username", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(newUserName),
+        });
+        const body: AuthResponse = await res.json();
+        if (!res.ok) throw new Error(body?.message || "Failed to update username.");
+        return body;
+    });
+}
+
 export async function logout() {
     return safeFetch( async () => {
         const res = await fetch('/api/auth/logout', { credentials: 'include' })

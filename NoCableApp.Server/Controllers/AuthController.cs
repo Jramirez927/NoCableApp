@@ -102,6 +102,18 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Logged out." });
     }
 
+    // PUT api/auth/username
+    [Authorize]
+    [HttpPut("username")]
+    public async Task<IActionResult> ChangeUsername([FromBody] string newUserName)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null) return Unauthorized();
+        var result = await _userManager.SetUserNameAsync(user, newUserName);
+        if (!result.Succeeded) return BadRequest(result.Errors);
+        return Ok(new { message = "Username updated." });
+    }
+
     // GET api/auth/me
     [Authorize]
     [HttpGet("me")]
