@@ -13,5 +13,6 @@ namespace NoCableApp.Server.Data
         }
 
         public DbSet<JournalEntry> JournalEntries { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
     }
 }
