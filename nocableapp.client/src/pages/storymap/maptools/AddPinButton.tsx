@@ -1,6 +1,6 @@
 import { GeoAltFill } from 'react-bootstrap-icons';
-import { MapUtils } from '../../utils/MapUtils';
-import { useMap } from '../../contexts/MapProvider';
+import { MapUtils } from '../../../utils/MapUtils';
+import { useMap } from '../../../contexts/MapProvider';
 import { useEffect, useState } from 'react';
 import { Coordinate } from 'ol/coordinate';
 import Translate from 'ol/interaction/Translate';

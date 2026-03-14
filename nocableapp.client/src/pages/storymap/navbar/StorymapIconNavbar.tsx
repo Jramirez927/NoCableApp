@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Storymap.module.css';
+import styles from '../Storymap.module.css';
 
 type Panel = 'entries' | 'feed' | 'friends' | null;
 

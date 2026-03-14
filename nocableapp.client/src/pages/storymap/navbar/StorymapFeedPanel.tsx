@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ListGroup, Spinner } from 'react-bootstrap';
-import { FeedEntry, getFeedEntries } from '../../api/JournalEntries';
+import { FeedEntry, getFeedEntries } from '../../../api/JournalEntries';
 
 const StorymapFeedPanel: React.FC = () => {
   const [entries, setEntries] = useState<FeedEntry[]>([]);
