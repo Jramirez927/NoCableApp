@@ -79,6 +79,39 @@ public class JournalEntriesController : ControllerBase
         });
     }
 
+    // GET api/journalentries/feed
+    [HttpGet("feed")]
+    public async Task<IActionResult> GetFeed()
+    {
+        var userId = _userManager.GetUserId(User);
+
+        var friendIds = await _db.Friendships
+            .Where(f => f.Status == FriendshipStatus.Accepted &&
+                        (f.RequesterId == userId || f.AddresseeId == userId))
+            .Select(f => f.RequesterId == userId ? f.AddresseeId : f.RequesterId)
+            .ToListAsync();
+
+        var entries = await _db.JournalEntries
+            .Where(e => friendIds.Contains(e.UserId))
+            .Include(e => e.User)
+            .OrderByDescending(e => e.DateVisited)
+            .Select(e => new
+            {
+                e.Id,
+                e.Title,
+                e.Body,
+                e.PlaceName,
+                e.Latitude,
+                e.Longitude,
+                e.DateVisited,
+                e.CreatedAt,
+                UserName = e.User!.UserName
+            })
+            .ToListAsync();
+
+        return Ok(entries);
+    }
+
     // DELETE api/journalentries/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)

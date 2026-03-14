@@ -38,6 +38,18 @@ export async function deleteJournalEntry(id: number) {
     });
 }
 
+export interface FeedEntry extends JournalEntry {
+    userName: string;
+}
+
+export async function getFeedEntries() {
+    return safeFetch<FeedEntry[]>(async () => {
+        const res = await fetch("/api/journalentries/feed", { credentials: "include" });
+        if (!res.ok) throw new Error("Failed to fetch feed.");
+        return res.json();
+    });
+}
+
 export async function createJournalEntry(payload: JournalEntryPayload) {
     return safeFetch<JournalEntry>(async () => {
         const res = await fetch("/api/journalentries", {
