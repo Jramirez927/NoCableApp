@@ -18,7 +18,9 @@ import {
   createJournalEntry,
   deleteJournalEntry,
   getJournalEntries,
+  getFeedEntries,
   JournalEntry,
+  FeedEntry,
 } from "../../api/journalEntries";
 
 import { useMap } from "../../contexts/MapProvider";
@@ -34,6 +36,7 @@ import { reverseGeocode } from "../../api/photon";
 const pinStyle = MapUtils.createPinIconStyle();
 
 const entryStyle = MapUtils.createEntryStyle("#f3250e", 0.2);
+const feedEntryStyle = MapUtils.createEntryStyle("#1a6fc4", 0.2);
 
 const StoryMap: React.FC = () => {
   const { map, mapDivRef } = useMap();
@@ -41,7 +44,7 @@ const StoryMap: React.FC = () => {
     { lat: number; lon: number } | undefined
   >();
   const [selectedJournalEntry, setSelectedJournalEntry] =
-    useState<JournalEntry | null>(null);
+    useState<JournalEntry & { userName?: string } | null>(null);
   const [locationSearchOpen, setLocationSearchOpen] = useState(false);
   const [journalFormOpen, setJournalFormOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"entries" | "feed" | "friends" | null>(null);
@@ -62,6 +65,15 @@ const StoryMap: React.FC = () => {
     }),
   );
 
+  const [feedEntries, setFeedEntries] = useState<FeedEntry[]>([]);
+  const feedEntriesSource = useRef(new VectorSource());
+  const feedEntriesLayer = useRef(
+    new VectorLayer({
+      source: feedEntriesSource.current,
+      style: feedEntryStyle,
+    }),
+  );
+
   const popupOverlayEl = useRef(document.createElement("div"));
   const popupOverlayRef = useRef<Overlay | null>(null);
 
@@ -76,6 +88,18 @@ const StoryMap: React.FC = () => {
       journalEntriesSource.current.addFeature(feature);
     });
   }, [journalEntries]);
+
+  // update feed entry points on map
+  useEffect(() => {
+    feedEntriesSource.current.clear();
+    feedEntries.forEach((entry) => {
+      const feature = new Feature(
+        new Point(fromLonLat([entry.longitude, entry.latitude])),
+      );
+      feature.setProperties(entry);
+      feedEntriesSource.current.addFeature(feature);
+    });
+  }, [feedEntries]);
   //update selected location after every selectedPlace change
   useEffect(() => {
     if (!selectedPlace) {
@@ -108,11 +132,16 @@ const StoryMap: React.FC = () => {
     map.addOverlay(overlay);
     popupOverlayRef.current = overlay;
 
+    map.addLayer(feedEntriesLayer.current);
     map.addLayer(journalEntriesLayer.current);
     map.addLayer(selectedPlaceLayer.current);
 
     getJournalEntries().then(({ data }) => {
       if (data) setJournalEntries(data);
+    });
+
+    getFeedEntries().then(({ data }) => {
+      if (data) setFeedEntries(data);
     });
 
     navigator.geolocation?.getCurrentPosition(({ coords }) => {
@@ -136,6 +165,14 @@ const StoryMap: React.FC = () => {
           setSelectedJournalEntry(entry);
           return true;
         }
+        if (layer === feedEntriesLayer.current) {
+          const entry = feature.getProperties() as FeedEntry;
+          const coord = (feature.getGeometry() as Point).getCoordinates();
+          setJournalFormOpen(false);
+          overlay.setPosition(coord);
+          setSelectedJournalEntry(entry);
+          return true;
+        }
       });
       if (!hit) {
         overlay.setPosition(undefined);
@@ -147,6 +184,7 @@ const StoryMap: React.FC = () => {
     return () => {
       map.un("click", handleClick as never);
       map.removeOverlay(overlay);
+      map.removeLayer(feedEntriesLayer.current);
       map.removeLayer(journalEntriesLayer.current);
       map.removeLayer(selectedPlaceLayer.current);
     };
@@ -270,7 +308,7 @@ const StoryMap: React.FC = () => {
               popupOverlayRef.current?.setPosition(undefined);
               setSelectedJournalEntry(null);
             }}
-            onDelete={handleDeleteEntry}
+            onDelete={"userName" in selectedJournalEntry ? undefined : handleDeleteEntry}
           />
         ) : null,
         popupOverlayEl.current,

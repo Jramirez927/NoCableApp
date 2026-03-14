@@ -3,9 +3,9 @@ import { Card, CloseButton, Button, Stack } from "react-bootstrap";
 import { JournalEntry } from "../../api/journalEntries";
 
 interface Props {
-  entry: JournalEntry;
+  entry: JournalEntry & { userName?: string };
   onClose: () => void;
-  onDelete: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 const JournalEntryPopup: React.FC<Props> = ({ entry, onClose, onDelete }) => {
@@ -41,8 +41,10 @@ const JournalEntryPopup: React.FC<Props> = ({ entry, onClose, onDelete }) => {
             {entry.body}
           </Card.Text>
           <Stack direction="horizontal" className="justify-content-between align-items-center">
-            <small className="text-muted">{dateVisited}</small>
-            <Button variant="light" size="sm" style={{ padding: "4px 6px" }} onClick={() => onDelete(entry.id)}><i className="bi bi-trash3"></i></Button>
+            <small className="text-muted">{entry.userName ? `${entry.userName} · ` : ""}{dateVisited}</small>
+            {onDelete && (
+              <Button variant="light" size="sm" style={{ padding: "4px 6px" }} onClick={() => onDelete(entry.id)}><i className="bi bi-trash3"></i></Button>
+            )}
           </Stack>
         </Card.Body>
       </Card>
