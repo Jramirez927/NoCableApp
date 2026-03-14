@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { ListGroup, Spinner } from "react-bootstrap";
-import { FeedEntry, getFeedEntries } from "../../api/JournalEntries";
+import React, { useEffect, useState } from 'react';
+import { ListGroup, Spinner } from 'react-bootstrap';
+import { FeedEntry, getFeedEntries } from '../../api/JournalEntries';
 
 const StorymapFeedPanel: React.FC = () => {
   const [entries, setEntries] = useState<FeedEntry[]>([]);
@@ -36,9 +36,9 @@ const StorymapFeedPanel: React.FC = () => {
                 <small className="fw-semibold">{e.userName}</small>
                 <small className="text-muted">
                   {new Date(e.dateVisited).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
                   })}
                 </small>
               </div>

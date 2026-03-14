@@ -1,6 +1,6 @@
-import React from "react";
-import { ListGroup } from "react-bootstrap";
-import { JournalEntry } from "../../api/JournalEntries";
+import React from 'react';
+import { ListGroup } from 'react-bootstrap';
+import { JournalEntry } from '../../api/JournalEntries';
 
 interface Props {
   entries: JournalEntry[];
@@ -17,9 +17,9 @@ const StorymapSidebar: React.FC<Props> = ({ entries }) => {
             <small className="text-muted d-block">{entry.placeName}</small>
             <small className="text-muted">
               {new Date(entry.dateVisited).toLocaleDateString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
               })}
             </small>
           </ListGroup.Item>
