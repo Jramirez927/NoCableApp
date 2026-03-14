@@ -12,13 +12,15 @@ export default function LoginPage() {
     })
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState({
+    const [errorMessage, setErrorMessage] = useState({
+        network: "",
         email: "",
         password: ""
     });
 
     function validate() {
         let errors = {
+            network: "",
             email: "",
             password: ""
         }
@@ -31,20 +33,21 @@ export default function LoginPage() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        setError({
+        setErrorMessage({
+            network: "",
             email: "",
             password: ""
         });
         const v = validate();
         if (v.email || v.password) {
-            setError(v);
+            setErrorMessage(v);
             return;
         }
 
         setLoading(true);
         const { error } = await login(input.email, input.password);
         if (error) {
-            setError({ email: "", password: error });
+            setErrorMessage({...errorMessage, network: error});
             setLoading(false);
         } else {
             navigate("/webapp", { replace: true });
@@ -56,7 +59,8 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} aria-label="Login form" className={styles.form}>
                 <h1>Sign in</h1>
 
-                {error.email && <div className={styles.errorMessage} role="alert">{error.email}</div>}
+                {errorMessage.network && <div className={styles.network} role="alert">{errorMessage.network}</div>}
+                {errorMessage.email && <div className={styles.errorMessage} role="alert">{errorMessage.email}</div>}
 
                 <label className={styles.emailLabel}>
                     <input
@@ -69,7 +73,7 @@ export default function LoginPage() {
                     />
                 </label>
 
-                {error.password && <div className={styles.errorMessage} role="alert">{error.password}</div>}
+                {errorMessage.password && <div className={styles.errorMessage} role="alert">{errorMessage.password}</div>}
                 <label className={styles.passwordLabel}>
                     <input
                         type={showPassword ? "text" : "password"}
