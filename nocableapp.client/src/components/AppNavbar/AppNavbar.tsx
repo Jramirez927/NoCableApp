@@ -1,9 +1,9 @@
-import { Navbar, Container, Nav } from "react-bootstrap";
+import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthProvider";
 
 export default function AppNavbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <Navbar variant="dark" bg="dark" expand="md">
@@ -30,9 +30,17 @@ export default function AppNavbar() {
               StoryMap
             </Nav.Link>
           </Nav>
-          {user && (
+          {user ? (
             <Nav>
-              <Navbar.Text>{user.email}</Navbar.Text>
+              <NavDropdown title={user.email} align="end">
+                <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          ) : (
+            <Nav>
+              <Nav.Link as={Link} to="/login">Login</Nav.Link>
+              <span className="text-secondary align-self-center">|</span>
+              <Nav.Link as={Link} to="/register">Register</Nav.Link>
             </Nav>
           )}
         </Navbar.Collapse>
