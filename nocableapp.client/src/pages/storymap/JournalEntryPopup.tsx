@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card, CloseButton, Button, Stack } from "react-bootstrap";
-import { JournalEntry } from "../../api/journalEntries";
+import { JournalEntry } from "../../api/JournalEntries";
 
 interface Props {
   entry: JournalEntry & { userName?: string };

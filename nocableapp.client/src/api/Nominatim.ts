@@ -1,4 +1,4 @@
-import { safeFetch } from "./safeFetch";
+import { safeFetch } from "./SafeFetch";
 
 export interface NominatimResult {
     place_id: number;

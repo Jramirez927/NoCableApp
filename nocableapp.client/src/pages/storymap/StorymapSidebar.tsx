@@ -1,6 +1,6 @@
 import React from "react";
 import { ListGroup } from "react-bootstrap";
-import { JournalEntry } from "../../api/journalEntries";
+import { JournalEntry } from "../../api/JournalEntries";
 
 interface Props {
   entries: JournalEntry[];

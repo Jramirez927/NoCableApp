@@ -14,7 +14,7 @@ import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Icon from 'ol/style/Icon';
 import type { Coordinate } from 'ol/coordinate';
-import type { JournalEntry } from '../api/journalEntries';
+import type { JournalEntry } from '../api/JournalEntries';
 import 'ol/ol.css';
 
 export type { OLMap, VectorSource, Feature };

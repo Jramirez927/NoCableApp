@@ -1,4 +1,4 @@
-import { safeFetch } from "./safeFetch";
+import { safeFetch } from "./SafeFetch";
 
 interface AuthResponse {
     message?: string;

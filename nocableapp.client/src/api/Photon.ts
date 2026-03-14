@@ -1,5 +1,5 @@
-import { safeFetch } from "./safeFetch";
-import type { NominatimResult } from "./nominatim";
+import { safeFetch } from "./SafeFetch";
+import type { NominatimResult } from "./Nominatim";
 export type { NominatimResult };
 
 interface PhotonFeature {

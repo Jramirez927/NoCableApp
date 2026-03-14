@@ -21,7 +21,7 @@ import {
   getFeedEntries,
   JournalEntry,
   FeedEntry,
-} from "../../api/journalEntries";
+} from "../../api/JournalEntries";
 
 import { useMap } from "../../contexts/MapProvider";
 import { fromLonLat, toLonLat } from "ol/proj";
@@ -31,7 +31,7 @@ import StorymapIconNavbar from "./StorymapIconNavbar";
 import StorymapFeedPanel from "./StorymapFeedPanel";
 import StorymapFriendsPanel from "./StorymapFriendsPanel";
 import { Coordinate } from "ol/coordinate";
-import { reverseGeocode } from "../../api/photon";
+import { reverseGeocode } from "../../api/Photon";
 
 const pinStyle = MapUtils.createPinIconStyle();
 

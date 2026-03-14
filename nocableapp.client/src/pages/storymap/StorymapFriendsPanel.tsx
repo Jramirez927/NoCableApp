@@ -11,7 +11,7 @@ import {
     declineFriendRequest,
     removeFriend,
     searchUsers,
-} from "../../api/friends";
+} from "../../api/Friends";
 
 const StorymapFriendsPanel: React.FC = () => {
     const [friends, setFriends] = useState<Friend[]>([]);

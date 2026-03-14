@@ -4,7 +4,7 @@ import {
     login as loginApi,
     register as registerApi,
     logout as logoutApi
-} from "../api/authentication";
+} from "../api/Authentication";
 
 interface User {
     email: string;
