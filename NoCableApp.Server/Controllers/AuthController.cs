@@ -73,7 +73,7 @@ public class AuthController : ControllerBase
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
-            return Unauthorized("Invalid credentials.");
+            return Unauthorized(new { message = "Invalid credentials." });
 
         var result = await _signInManager.PasswordSignInAsync(
             user,
@@ -82,13 +82,13 @@ public class AuthController : ControllerBase
             lockoutOnFailure: true);
 
         if (result.IsLockedOut)
-            return Unauthorized("Account locked. Try again in 5 minutes.");
+            return Unauthorized(new { message = "Account locked. Try again in 5 minutes." });
 
         if (result.IsNotAllowed)
-            return Unauthorized("You must confirm your email before logging in.");
+            return Unauthorized(new { message = "You must confirm your email before logging in." });
 
         if (!result.Succeeded)
-            return Unauthorized("Invalid credentials.");
+            return Unauthorized(new { message = "Invalid credentials." });
 
         return Ok(new { message = "Logged in." });
     }

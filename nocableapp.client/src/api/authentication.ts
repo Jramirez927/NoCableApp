@@ -54,7 +54,7 @@ export async function changeUsername(newUserName: string) {
 
 export async function logout() {
     return safeFetch( async () => {
-        const res = await fetch('/api/auth/logout', { credentials: 'include' })
+        const res = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
         return res.ok? await res.json() : null;
     })
 }
