@@ -52,9 +52,12 @@ namespace NoCableApp.Server
                 options.KnownProxies.Clear();
             });
 
-            // Persist DataProtection keys to Docker volume — auth cookies survive container restarts
+            // Persist DataProtection keys — use Docker volume path in production, local path in dev
+            var keysPath = builder.Environment.IsDevelopment()
+                ? Path.Combine(builder.Environment.ContentRootPath, "data", "keys")
+                : "/app/data/keys";
             builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new System.IO.DirectoryInfo("/app/data/keys"))
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo(keysPath))
                 .SetApplicationName("NoCableApp");
 
             // Register a development email sender. Replace with SMTP/SendGrid in production.
