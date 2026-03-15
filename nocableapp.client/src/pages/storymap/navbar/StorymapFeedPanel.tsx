@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ListGroup, Spinner } from 'react-bootstrap';
 import { FeedEntry, getFeedEntries } from '../../../api/JournalEntries';
 
-const StorymapFeedPanel: React.FC = () => {
+interface Props {
+  onSelect: (entry: FeedEntry) => void;
+}
+
+const StorymapFeedPanel: React.FC<Props> = ({ onSelect }) => {
   const [entries, setEntries] = useState<FeedEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +26,7 @@ const StorymapFeedPanel: React.FC = () => {
 
   return (
     <>
-      <div className="px-3 py-2 border-bottom fw-semibold">Feed</div>
+      <div className="px-3 py-2 border-bottom fw-semibold bg-white sticky-top">Feed</div>
       <ListGroup variant="flush">
         {entries.length === 0 ? (
           <ListGroup.Item className="text-muted text-center py-4">
@@ -31,7 +35,7 @@ const StorymapFeedPanel: React.FC = () => {
           </ListGroup.Item>
         ) : (
           entries.map((e) => (
-            <ListGroup.Item key={e.id}>
+            <ListGroup.Item key={e.id} action onClick={() => onSelect(e)} style={{ cursor: 'pointer' }}>
               <div className="d-flex justify-content-between">
                 <small className="fw-semibold">{e.userName}</small>
                 <small className="text-muted">

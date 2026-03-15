@@ -6,9 +6,10 @@ import LocationSearchToggle from './maptools/LocationSearchToggle';
 import AddJournalEntryButton from './maptools/AddJournalEntryButton';
 import JournalEntryForm from './maptools/JournalEntryForm';
 import AddPinButton from './maptools/AddPinButton';
-import { JournalEntry } from '../../api/JournalEntries';
+import { JournalEntry, FeedEntry } from '../../api/JournalEntries';
 import { useMap } from '../../contexts/MapProvider';
 import { fromLonLat, toLonLat } from 'ol/proj';
+import { MapUtils } from '../../utils/MapUtils';
 import JournalEntryPopup from './JournalEntryPopup';
 import StorymapSidebar from './navbar/StorymapSidebar';
 import StorymapIconNavbar from './navbar/StorymapIconNavbar';
@@ -105,6 +106,16 @@ const StoryMap: React.FC = () => {
     if (deleted) setSelectedJournalEntry(null);
   };
 
+  const handleEntrySelect = (entry: JournalEntry | FeedEntry) => {
+    if (!map) return;
+    const coord = fromLonLat([entry.longitude, entry.latitude]);
+    setJournalFormOpen(false);
+    setSelectedJournalEntry(entry as JournalEntry & { userName?: string });
+    MapUtils.navigateToCoords(map, coord, { zoom: 14 }, () => {
+      popupOverlay.current?.setPosition(coord);
+    });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.mapWrapper}>
@@ -119,9 +130,11 @@ const StoryMap: React.FC = () => {
             open={locationSearchOpen}
             onToggle={() => setLocationSearchOpen((p) => !p)}
           />
-          {selectedPlace && (
-            <AddJournalEntryButton open={journalFormOpen} onToggle={handleJournalFormToggle} />
-          )}
+          <AddJournalEntryButton
+            disabled={!selectedPlace}
+            open={journalFormOpen}
+            onToggle={handleJournalFormToggle}
+          />
           <AddPinButton
             selectedPlace={selectedPlace}
             setSelectedPlace={setSelectedPlace}
@@ -136,12 +149,12 @@ const StoryMap: React.FC = () => {
       )}
       {activePanel === 'feed' && (
         <div className={styles.sidePanel}>
-          <StorymapFeedPanel />
+          <StorymapFeedPanel onSelect={handleEntrySelect} />
         </div>
       )}
       {activePanel === 'entries' && (
         <div className={styles.sidePanel}>
-          <StorymapSidebar entries={journalEntries} />
+          <StorymapSidebar entries={journalEntries} onSelect={handleEntrySelect} />
         </div>
       )}
       <StorymapIconNavbar activePanel={activePanel} onToggle={setActivePanel} />
