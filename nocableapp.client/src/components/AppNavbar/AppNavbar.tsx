@@ -41,6 +41,7 @@ export default function AppNavbar() {
                   </span>
                 }
                 align="end"
+                style={{ zIndex: 9999 }}
               >
                 <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
               </NavDropdown>
