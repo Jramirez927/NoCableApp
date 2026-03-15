@@ -14,6 +14,7 @@ A full-stack social travel journaling app. Users pin journal entries on a map, a
 - **React 19** + **TypeScript 5** (strict mode)
 - **Vite 7** (dev server on **https://localhost:5173**, proxies `/api` → backend)
 - **Bootstrap 5** for UI — used directly via utility classes and via **React Bootstrap 2** (React component wrappers built on Bootstrap 5)
+- **Bootstrap Icons** + **React Bootstrap Icons** for iconography
 - **OpenLayers 10** for the interactive map
 - **React Router 7** for routing
 
@@ -43,10 +44,15 @@ NoCableApp.Server/
 
 nocableapp.client/src/
   api/               # API client functions (one file per domain)
+                     # Nominatim.ts + Photon.ts for external geocoding (location search)
   contexts/          # React contexts (AuthProvider, MapProvider)
   components/        # Reusable components (AppNavbar, LocationSearch, ProtectedRoute)
   pages/             # Page-level components (one folder per route)
     storymap/        # Main map page and all its sub-components
+      hooks/         # Custom hooks: useMapSetup, useJournalEntries, useSelectedPlace
+      maptools/      # Map interaction UI: AddPinButton, AddJournalEntryButton, JournalEntryForm, LocationSearchToggle
+      navbar/        # Sidebar/panel components: StorymapIconNavbar, StorymapSidebar, StorymapFeedPanel, StorymapFriendsPanel
+      navbar/friends/ # Friends sub-components: FriendSearch, FriendsList, FriendRequests
   utils/             # MapUtils.ts (OpenLayers helpers)
 ```
 
@@ -72,6 +78,28 @@ if (data) doSomethingWith(data);
 
 All `fetch` calls include `credentials: "include"` for cookie auth.
 
+### API Endpoints
+
+| Controller | Method | Route | Auth |
+|---|---|---|---|
+| Auth | POST | `/api/auth/register` | — |
+| Auth | GET | `/api/auth/confirm-email` | — |
+| Auth | POST | `/api/auth/login` | — |
+| Auth | POST | `/api/auth/logout` | ✓ |
+| Auth | GET | `/api/auth/me` | ✓ |
+| Auth | PUT | `/api/auth/username` | ✓ |
+| JournalEntries | GET | `/api/journalentries` | ✓ |
+| JournalEntries | POST | `/api/journalentries` | ✓ |
+| JournalEntries | GET | `/api/journalentries/feed` | ✓ (friends' entries) |
+| JournalEntries | DELETE | `/api/journalentries/{id}` | ✓ |
+| Friends | GET | `/api/friends` | ✓ (accepted) |
+| Friends | GET | `/api/friends/requests` | ✓ (pending) |
+| Friends | POST | `/api/friends/request/{userName}` | ✓ |
+| Friends | PUT | `/api/friends/{id}/accept` | ✓ |
+| Friends | PUT | `/api/friends/{id}/decline` | ✓ |
+| Friends | DELETE | `/api/friends/{id}` | ✓ |
+| Users | GET | `/api/users/search?q=username` | ✓ |
+
 ### Adding a new API endpoint
 1. Add controller action (C#)
 2. Add interface + async function in the matching `src/api/*.ts` file
@@ -91,8 +119,11 @@ DbContext: `NoCableDbContext` → `DbSet<JournalEntry>`, `DbSet<Friendship>`; in
 
 - Cookie-based, HttpOnly, SameSite=Strict, HTTPS only
 - 1-hour sliding session
-- Email confirmation required before first login
+- Email confirmation required before first login; confirmation tokens valid for 3 days
+- Account lockout: 5 minutes after 3 failed login attempts
+- Password requirements: 8 chars min, uppercase, lowercase, digit, non-alphanumeric
 - Frontend: `AuthProvider` context → `useAuth()` hook → `ProtectedRoute` component
+  - `useAuth()` exposes: `user`, `loading`, `login()`, `logout()`, `register()`, `checkAuth()`
 - All authenticated requests automatically send the cookie via `credentials: "include"`
 
 ## Naming Conventions
@@ -112,9 +143,14 @@ DbContext: `NoCableDbContext` → `DbSet<JournalEntry>`, `DbSet<Friendship>`; in
 
 All OL helpers live in `src/utils/MapUtils.ts` (static class). Use them instead of calling OL directly:
 - `MapUtils.createEntryStyle(color, scale)` — journal entry SVG marker
+- `MapUtils.createPinStyle(color, radius)` — simple circle pin style
 - `MapUtils.createPinIconStyle(color, scale)` — search/drop pin
 - `MapUtils.navigateToCoords(map, coords, options, onComplete)` — animated pan/zoom
 - `MapUtils.createVectorLayer(style)` — returns `{ source, layer }`
+- `MapUtils.initMap(target, vectorLayer, options)` — initialize OL map on a DOM element
+- `MapUtils.createEntryFeature(entry)` — create an OL feature from a journal entry
+- `MapUtils.addFeature(source, feature)` — add a feature to a vector source
+- `MapUtils.getFeatureById(source, id)` — look up a feature by id
 
 The map instance is shared via `MapProvider` context → `useMap()` returns `{ map, mapDivRef }`.
 
@@ -126,7 +162,7 @@ Coordinate system: store and transmit as `[longitude, latitude]` (EPSG:4326); co
 |---|---|
 | `NoCableApp.Server/Program.cs` | App startup, auth config, middleware |
 | `NoCableApp.Server/Data/NoCableDbContext.cs` | EF schema |
-| `nocableapp.client/src/api/safeFetch.ts` | Result wrapper for all API calls |
+| `nocableapp.client/src/api/SafeFetch.ts` | Result wrapper for all API calls |
 | `nocableapp.client/src/contexts/AuthProvider.tsx` | Auth state + methods |
 | `nocableapp.client/src/contexts/MapProvider.tsx` | OL map instance |
 | `nocableapp.client/src/utils/MapUtils.ts` | OL utilities |
