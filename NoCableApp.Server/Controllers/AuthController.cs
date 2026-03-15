@@ -123,6 +123,6 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized();
 
-        return Ok(new { user.Email });
+        return Ok(new { user.Email, user.UserName });
     }
 }

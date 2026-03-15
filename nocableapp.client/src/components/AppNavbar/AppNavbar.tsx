@@ -32,7 +32,7 @@ export default function AppNavbar() {
           </Nav>
           {user ? (
             <Nav>
-              <NavDropdown title={user.email} align="end">
+              <NavDropdown title={user.userName} align="end">
                 <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>
