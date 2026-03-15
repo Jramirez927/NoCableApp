@@ -1,110 +1,84 @@
-Here's the improved `README.md` file incorporating the new content while maintaining the existing structure and coherence:
-
-# Project Title
+# NoCableApp
 
-## Description
+A full-stack social travel journaling app. Users pin journal entries on an interactive map, add friends, and browse friends' entries on a shared map feed.
 
-[Provide a brief description of the project, its purpose, and key features.]
+## Features
 
-## Installation
+- **Map-based journaling** — pin entries to locations with a title, body, and date visited
+- **Friends system** — send/accept friend requests and view friends' entries on your map feed
+- **Secure auth** — cookie-based authentication with email confirmation and account lockout
+- **Location search** — search for places using Nominatim/Photon geocoding
 
-[Instructions on how to install the project, including prerequisites and dependencies.]
+## Stack
 
-## Usage
+- **Backend:** .NET 8 / ASP.NET Core, Entity Framework Core 8, SQLite, ASP.NET Identity
+- **Frontend:** React 19 + TypeScript 5, Vite 7, Bootstrap 5, OpenLayers 10, React Router 7
 
-[Instructions on how to use the project, including examples and command-line options.]
-
-## Database Setup
-
-This project uses **SQLite** with **Entity Framework Core** migrations.
+## Getting Started
 
 ### Prerequisites
 
-Install the EF Core CLI tools (if not already installed):
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- EF Core CLI tools:
+  ```bash
+  dotnet tool install --global dotnet-ef
+  ```
 
+### 1. Set up a local HTTPS certificate (mkcert)
+
+The Vite dev server runs over HTTPS and requires a trusted local certificate.
+
+```bash
+# Install mkcert (macOS: brew install mkcert, Windows: choco install mkcert)
+mkcert -install
+mkdir -p nocableapp.client/certs
+mkcert -cert-file nocableapp.client/certs/localhost.pem \
+       -key-file nocableapp.client/certs/localhost-key.pem \
+       localhost 127.0.0.1 ::1
 ```
-dotnet tool install --global dotnet-ef
-```
 
-### Apply Migrations
+> The `certs/` folder is already in `.gitignore` — do not commit private keys.
 
-From the `NoCableApp.Server` directory, run:
+### 2. Apply database migrations
 
-```
+```bash
 cd NoCableApp.Server
 dotnet ef database update
 ```
 
-This will create the `NoCableApp.db` SQLite file and apply all existing migrations.
+This creates `NoCableApp.db` and applies all migrations.
 
-### Create a New Migration (when you change models)
+### 3. Run the app
 
-```
-dotnet ef migrations add <MigrationName>
-dotnet ef database update
-```
-
----
-
-## Local HTTPS Development (mkcert)
-
-This project uses a local TLS certificate for the Vite dev server when running the SPA over HTTPS. **Do NOT commit private key files to source control** � each developer should generate their own trusted dev certificate.
-
-### Steps to Set Up a Trusted Local Certificate (Recommended Using mkcert):
-
-1. **Install mkcert.** On Windows, you can use Chocolatey:
-   choco install mkcert -y
-
-2. **Install the local CA into your OS trust store:**
-   mkcert -install
-
-3. **From the repository root, create a `certs` folder inside the client project and generate certs for localhost:**
-   mkdir -p nocableapp.client/certs
-   mkcert -cert-file nocableapp.client/certs/localhost.pem -key-file nocableapp.client/certs/localhost-key.pem localhost 127.0.0.1 ::1
-
-4. **Ensure the `nocableapp.client/certs` folder is ignored by Git** (it is already added to `.gitignore`).
-
-5. **The Vite config is set to load the cert/key from `nocableapp.client/certs/localhost.pem` and `nocableapp.client/certs/localhost-key.pem`.** Restart your IDE after installing the mkcert CA if you still see TLS errors.
-
-### Notes
-- If you cannot install mkcert on a managed machine, use HTTP for local development or ask your IT team to provide a trusted cert.
-- Do not commit `localhost-key.pem` or any private keys. Add them to `.gitignore` if not already ignored.
-
-## Running the Application
-
-### Server
-
-Always start the server with the **https** launch profile so that port `7054` (HTTPS) is active. The Vite dev proxy forwards `/api` requests to that port.
-
+**Terminal 1 — Backend** (must use the `https` profile):
 ```bash
 cd NoCableApp.Server
 dotnet run --launch-profile https
 ```
+Backend runs at `https://localhost:7054`.
 
-> If you run `dotnet run` without specifying a profile, the default `http` profile is used (port `5038` HTTP only), and the Vite proxy will fail to connect.
-
-### Client
-
-From the `nocableapp.client` directory:
-
+**Terminal 2 — Frontend:**
 ```bash
+cd nocableapp.client
+npm install   # first time only
 npm run dev
 ```
+Frontend runs at `https://localhost:5173`. All `/api` requests are proxied to the backend.
 
-The React app will be available at `https://localhost:5173`. All `/api` requests are automatically proxied to `https://localhost:7054`.
+> Running `dotnet run` without `--launch-profile https` starts on HTTP only and the Vite proxy will fail.
 
----
+## Development Notes
 
-## Contributing
+- **Email confirmation** — dev emails (registration, confirmation) are written to `NoCableApp.Server/Emails/` instead of being sent via SMTP.
+- **Auth** — sessions are cookie-based (HttpOnly, SameSite=Strict). No tokens. The frontend uses `AuthProvider` → `useAuth()` → `ProtectedRoute`.
+- **API calls** — all frontend API calls go through `safeFetch` in `src/api/SafeFetch.ts`, which returns `{ data, error }`. Always check `data` before using it.
+- **Map** — the OpenLayers map instance is shared via `MapProvider` → `useMap()`. Use helpers in `src/utils/MapUtils.ts` rather than calling OpenLayers directly.
 
-[Instructions for contributing to the project, including guidelines for submitting issues and pull requests.]
+### Adding a database migration
 
-## License
-
-[Information about the project's license.]
-
-### Changes Made:
-- Added a section header for "Local HTTPS Development (mkcert)" to clearly delineate this important setup information.
-- Used bullet points and bold text for emphasis and clarity.
-- Ensured that the instructions are clear and easy to follow, maintaining a logical flow.
-- Preserved the overall structure of the README while integrating the new content seamlessly.
+```bash
+cd NoCableApp.Server
+dotnet ef migrations add <MigrationName>
+dotnet ef database update
+```
