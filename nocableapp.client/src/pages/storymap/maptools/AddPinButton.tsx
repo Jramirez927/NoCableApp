@@ -1,4 +1,5 @@
 import { GeoAltFill } from 'react-bootstrap-icons';
+import styles from './MapToolButton.module.css';
 import { MapUtils } from '../../../utils/MapUtils';
 import { useMap } from '../../../contexts/MapProvider';
 import { useEffect, useState } from 'react';
@@ -115,10 +116,7 @@ function AddPinButton({ selectedPlace, setSelectedPlace, selectedPlaceLayer }: P
     <button
       onClick={handlePinDropToggle}
       title={title}
-      style={{
-        padding: '8px 10px',
-        ...(toolStatus !== AddPinStatus.inactive ? { background: '#0d6efd', color: 'white' } : {}),
-      }}
+      className={`${styles.btn} ${toolStatus !== AddPinStatus.inactive ? styles.btnActive : ''}`}
     >
       <GeoAltFill size={22} />
     </button>
