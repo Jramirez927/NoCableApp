@@ -1,4 +1,6 @@
 
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +42,21 @@ namespace NoCableApp.Server
             builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
                 opt.TokenLifespan = TimeSpan.FromDays(3));
 
+            // Trust X-Forwarded-Proto from Nginx (required for HTTPS cookies behind reverse proxy)
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
+            // Persist DataProtection keys to Docker volume — auth cookies survive container restarts
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo("/app/data/keys"))
+                .SetApplicationName("NoCableApp");
+
             // Register a development email sender. Replace with SMTP/SendGrid in production.
             builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
 
@@ -76,6 +93,14 @@ namespace NoCableApp.Server
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<NoCableDbContext>();
+                db.Database.Migrate();
+            }
+
+            app.UseForwardedHeaders();
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
@@ -84,9 +109,8 @@ namespace NoCableApp.Server
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseHttpsRedirection();
             }
-
-            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

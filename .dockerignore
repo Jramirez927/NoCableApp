@@ -23,6 +23,8 @@
 **/values.dev.yaml
 LICENSE
 README.md
+nocableapp.client/dist/
+NoCableApp.Server/NoCableApp.db
 !**/.gitignore
 !.git/HEAD
 !.git/config

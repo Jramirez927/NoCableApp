@@ -1,0 +1,15 @@
+services:
+  app:
+    image: ${ECR_REGISTRY}/nocableapp:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - nocableapp-data:/app/data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/NoCableApp.db
+
+volumes:
+  nocableapp-data:
+    driver: local
