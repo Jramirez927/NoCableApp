@@ -1,4 +1,5 @@
 import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
+import { PersonCircle } from 'react-bootstrap-icons';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthProvider';
 
@@ -32,7 +33,15 @@ export default function AppNavbar() {
           </Nav>
           {user ? (
             <Nav>
-              <NavDropdown title={user.userName} align="end">
+              <NavDropdown
+                title={
+                  <span className="text-nowrap">
+                    <PersonCircle size={20} className="me-2" style={{ verticalAlign: 'text-bottom' }} />
+                    {user.userName}
+                  </span>
+                }
+                align="end"
+              >
                 <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
               </NavDropdown>
             </Nav>
