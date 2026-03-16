@@ -1,6 +1,5 @@
 
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -60,8 +59,10 @@ namespace NoCableApp.Server
                 .PersistKeysToFileSystem(new System.IO.DirectoryInfo(keysPath))
                 .SetApplicationName("NoCableApp");
 
-            // Register a development email sender. Replace with SMTP/SendGrid in production.
-            builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+            if (builder.Environment.IsDevelopment())
+                builder.Services.AddSingleton<IEmailSender, FileEmailSender>();
+            else
+                builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
 
             // Configure cookie authentication
             builder.Services.ConfigureApplicationCookie(options =>
