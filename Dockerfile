@@ -1,5 +1,5 @@
 # Stage 1: Build React frontend
-FROM node:22-alpine AS frontend-build
+FROM public.ecr.aws/docker/library/node:22-alpine AS frontend-build
 WORKDIR /frontend
 COPY nocableapp.client/package.json nocableapp.client/package-lock.json ./
 RUN npm ci
