@@ -1,4 +1,4 @@
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export default function EmailConfirmed() {
   const [searchParams] = useSearchParams();
@@ -14,9 +14,9 @@ export default function EmailConfirmed() {
             <p className="text-secondary mb-4">
               Your email has been confirmed. You can now log in to your account.
             </p>
-            <Link to="/login" className="btn btn-primary">
+            <a href="/login" className="btn btn-primary">
               Go to Login
-            </Link>
+            </a>
           </>
         ) : (
           <>
@@ -25,9 +25,9 @@ export default function EmailConfirmed() {
             <p className="text-secondary mb-4">
               The confirmation link is invalid or has expired. Please register again or contact support.
             </p>
-            <Link to="/register" className="btn btn-primary">
+            <a href="/register" className="btn btn-primary">
               Register Again
-            </Link>
+            </a>
           </>
         )}
       </div>
