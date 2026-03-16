@@ -1,4 +1,3 @@
-using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -39,7 +38,7 @@ public class AuthController : ControllerBase
 
         var confirmationLink = Url.Action(
             nameof(ConfirmEmail), "Auth",
-            new { userId = user.Id, token = HttpUtility.UrlEncode(token) },
+            new { userId = user.Id, token },
             Request.Scheme)!;
 
         var emailBody = $"""
@@ -48,7 +47,7 @@ public class AuthController : ControllerBase
               <p>Thanks for signing up. Please confirm your email address to activate your account.</p>
               <p style="margin: 24px 0;">
                 <a href="{confirmationLink}"
-                   style="background-color: #0d6efd; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+                   style="display:inline-block;background-color:#0d6efd;color:#ffffff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:16px;">
                   Confirm Email
                 </a>
               </p>
@@ -70,14 +69,15 @@ public class AuthController : ControllerBase
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
-        var frontendBase = $"{Request.Scheme}://{Request.Host.Host}:{(Request.Host.Port == 7054 ? 5173 : Request.Host.Port)}";
+        var frontendBase = Request.Host.Port == 7054
+            ? $"{Request.Scheme}://{Request.Host.Host}:5173"
+            : $"{Request.Scheme}://{Request.Host.Host}";
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return Redirect($"{frontendBase}/email-confirmed?error=invalid-user");
 
-        var decoded = HttpUtility.UrlDecode(token);
-        var result = await _userManager.ConfirmEmailAsync(user, decoded);
+        var result = await _userManager.ConfirmEmailAsync(user, token);
 
         if (!result.Succeeded)
             return Redirect($"{frontendBase}/email-confirmed?error=invalid-token");

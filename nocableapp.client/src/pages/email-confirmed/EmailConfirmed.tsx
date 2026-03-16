@@ -9,7 +9,9 @@ export default function EmailConfirmed() {
       <div className="text-center" style={{ maxWidth: 420 }}>
         {success ? (
           <>
-            <div className="mb-3" style={{ fontSize: 48 }}>✓</div>
+            <div className="mb-3" style={{ fontSize: 48 }}>
+              ✓
+            </div>
             <h2 className="mb-2">Email Verified!</h2>
             <p className="text-secondary mb-4">
               Your email has been confirmed. You can now log in to your account.
@@ -20,10 +22,13 @@ export default function EmailConfirmed() {
           </>
         ) : (
           <>
-            <div className="mb-3" style={{ fontSize: 48 }}>✗</div>
+            <div className="mb-3" style={{ fontSize: 48 }}>
+              ✗
+            </div>
             <h2 className="mb-2">Verification Failed</h2>
             <p className="text-secondary mb-4">
-              The confirmation link is invalid or has expired. Please register again or contact support.
+              The confirmation link is invalid or has expired. Please register again or contact
+              support.
             </p>
             <a href="/register" className="btn btn-primary">
               Register Again
