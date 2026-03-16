@@ -80,7 +80,7 @@ export default function RegisterPage() {
 
   if (registered) {
     return (
-      <div className={styles.container}>
+      <div className={styles.confirmationContainer}>
         <div className={styles.confirmation}>
           <h1>Check your email</h1>
           <p>

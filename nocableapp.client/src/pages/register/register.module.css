@@ -1,5 +1,11 @@
 .container {
   margin: 0 auto;
+  width: 360px;
+  align-self: center;
+}
+
+.confirmationContainer {
+  margin: 0 auto;
   width: 480px;
   align-self: center;
 }
