@@ -70,17 +70,19 @@ public class AuthController : ControllerBase
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
+        var frontendBase = $"{Request.Scheme}://{Request.Host.Host}:{(Request.Host.Port == 7054 ? 5173 : Request.Host.Port)}";
+
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
-            return BadRequest("Invalid user.");
+            return Redirect($"{frontendBase}/email-confirmed?error=invalid-user");
 
         var decoded = HttpUtility.UrlDecode(token);
         var result = await _userManager.ConfirmEmailAsync(user, decoded);
 
         if (!result.Succeeded)
-            return BadRequest("Invalid or expired confirmation token.");
+            return Redirect($"{frontendBase}/email-confirmed?error=invalid-token");
 
-        return Ok(new { message = "Email confirmed! You can now log in." });
+        return Redirect($"{frontendBase}/email-confirmed?success=true");
     }
 
     // POST api/auth/login
