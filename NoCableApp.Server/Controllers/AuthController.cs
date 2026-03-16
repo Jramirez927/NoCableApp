@@ -42,10 +42,26 @@ public class AuthController : ControllerBase
             new { userId = user.Id, token = HttpUtility.UrlEncode(token) },
             Request.Scheme)!;
 
+        var emailBody = $"""
+            <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+              <h2 style="color: #1a1a1a;">Welcome to NoCable!</h2>
+              <p>Thanks for signing up. Please confirm your email address to activate your account.</p>
+              <p style="margin: 24px 0;">
+                <a href="{confirmationLink}"
+                   style="background-color: #0d6efd; color: #fff; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+                  Confirm Email
+                </a>
+              </p>
+              <p style="color: #666; font-size: 14px;">
+                If you didn't create an account on <a href="https://no-cable.com">no-cable.com</a>, you can safely ignore this email.
+              </p>
+            </div>
+            """;
+
         await _emailSender.SendEmailAsync(
             user.Email,
             "Confirm your NoCable account",
-            $"<a href=\"{confirmationLink}\">Click here to confirm your email</a>");
+            emailBody);
 
         return Ok(new { message = "Registration successful. Check your email to confirm." });
     }
