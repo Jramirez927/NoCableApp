@@ -36,6 +36,7 @@ phases:
       - docker push $ECR_REGISTRY/$IMAGE_REPO_NAME:latest
       - echo "ECR_REGISTRY=$ECR_REGISTRY" > /tmp/ecr_env
       - echo "IMAGE_TAG=$IMAGE_TAG" >> /tmp/ecr_env
+      - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION" >> /tmp/ecr_env
       - cp /tmp/ecr_env scripts/ecr_env
 
 artifacts:
