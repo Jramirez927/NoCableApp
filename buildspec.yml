@@ -6,6 +6,7 @@ env:
   parameter-store:
     SMTP_USERNAME: /nocableapp/smtp-username
     SMTP_PASSWORD: /nocableapp/smtp-password
+    GMAIL_SMTP_PASS: /nocableapp/gmail-smtp-pass
 
 phases:
   pre_build:
@@ -42,6 +43,7 @@ phases:
       - echo "AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION" >> /tmp/ecr_env
       - echo "SMTP_USERNAME=$SMTP_USERNAME" >> /tmp/ecr_env
       - echo "SMTP_PASSWORD=$SMTP_PASSWORD" >> /tmp/ecr_env
+      - echo "GMAIL_SMTP_PASS=$GMAIL_SMTP_PASS" >> /tmp/ecr_env
       - cp /tmp/ecr_env scripts/ecr_env
 
 artifacts:

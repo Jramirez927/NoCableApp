@@ -11,6 +11,7 @@ services:
       - ConnectionStrings__DefaultConnection=Data Source=/app/data/NoCableApp.db
       - Smtp__Username=${SMTP_USERNAME}
       - Smtp__Password=${SMTP_PASSWORD}
+      - SmtpGmail__Password=${GMAIL_SMTP_PASS}
 
 volumes:
   nocableapp-data:

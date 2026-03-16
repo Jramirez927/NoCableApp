@@ -16,7 +16,7 @@ public class SmtpEmailSender : IEmailSender
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        var smtp = _config.GetSection("Smtp");
+        var smtp = _config.GetSection("SmtpGmail");
 
         var message = new MimeMessage();
         message.From.Add(MailboxAddress.Parse(smtp["From"]!));
