@@ -12,7 +12,7 @@ aws ecr get-login-password --region $AWS_DEFAULT_REGION \
 docker pull $ECR_REGISTRY/nocableapp:latest
 
 # Restart container with new image, keep the volume
-docker compose up --force-recreate --no-build -d
+docker-compose up --force-recreate --no-build -d
 
 # Clean up old images
 docker image prune -f

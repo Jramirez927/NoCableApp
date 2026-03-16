@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/ubuntu/nocableapp
-docker compose down || true
+docker-compose down || true
