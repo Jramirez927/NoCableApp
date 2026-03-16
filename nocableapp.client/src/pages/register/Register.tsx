@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './register.module.css';
 import { useAuth } from '../../contexts/AuthProvider';
 
 export default function RegisterPage() {
-  const navigate = useNavigate();
   const { register } = useAuth();
   const [input, setInput] = useState({
     userName: '',
@@ -21,6 +19,7 @@ export default function RegisterPage() {
   const [fetchError, setFetchError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   function validate(): {
     userName: string;
@@ -74,8 +73,24 @@ export default function RegisterPage() {
       setFetchError(error);
       setLoading(false);
     } else {
-      navigate('/webapp', { replace: true });
+      setRegistered(true);
+      setLoading(false);
     }
+  }
+
+  if (registered) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.confirmation}>
+          <h1>Check your email</h1>
+          <p>
+            We sent a confirmation link to <strong>{input.email}</strong>.
+          </p>
+          <p>Click the link in that email to activate your account, then you can log in.</p>
+          <a href="/login">Go to Login</a>
+        </div>
+      </div>
+    );
   }
 
   return (

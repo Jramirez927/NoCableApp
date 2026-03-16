@@ -1,7 +1,13 @@
 .container {
   margin: 0 auto;
-  width: 360px;
+  width: 480px;
   align-self: center;
+}
+
+.confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .form {
