@@ -2,6 +2,7 @@ import Home from './pages/home';
 import { Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/login/Login';
 import RegisterPage from './pages/register/Register';
+import AboutPage from './pages/about/About';
 import { JSX } from 'react';
 import ProtectedRoute from './components/ProtectedRoute';
 import StoryMap from './pages/storymap/Storymap';
@@ -29,6 +30,7 @@ function App(): JSX.Element {
               />
             }
           />
+          <Route path="about" element={<AboutPage />} />
           <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
       </div>
