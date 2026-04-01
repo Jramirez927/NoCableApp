@@ -5,12 +5,12 @@ interface AuthResponse {
   [key: string]: unknown;
 }
 
-export async function login(email: string, password: string) {
+export async function login(emailusername: string, password: string) {
   return safeFetch(async () => {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ emailusername, password }),
     });
     const body: AuthResponse = await res.json();
     if (!res.ok) throw new Error(body?.message || 'Login failed.');

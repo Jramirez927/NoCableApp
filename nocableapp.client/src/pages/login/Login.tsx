@@ -7,26 +7,24 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [input, setInput] = useState({
-    email: '',
+    emailusername: '',
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState({
     network: '',
-    email: '',
+    emailusername: '',
     password: '',
   });
 
   function validate() {
     let errors = {
       network: '',
-      email: '',
+      emailusername: '',
       password: '',
     };
-    if (!input.email) errors.email = 'Email is required.';
-    // simple email check
-    else if (!/^\S+@\S+\.\S+$/.test(input.email)) errors.email = 'Enter a valid email.';
+    if (!input.emailusername) errors.emailusername = 'Email/Username is required.';
     if (!input.password) errors.password = 'Password is required.';
     return errors;
   }
@@ -35,17 +33,17 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMessage({
       network: '',
-      email: '',
+      emailusername: '',
       password: '',
     });
     const v = validate();
-    if (v.email || v.password) {
+    if (v.emailusername || v.password) {
       setErrorMessage(v);
       return;
     }
 
     setLoading(true);
-    const { error } = await login(input.email, input.password);
+    const { error } = await login(input.emailusername, input.password);
     if (error) {
       setErrorMessage({ ...errorMessage, network: error });
       setLoading(false);
@@ -64,20 +62,20 @@ export default function LoginPage() {
             {errorMessage.network}
           </div>
         )}
-        {errorMessage.email && (
+        {errorMessage.emailusername && (
           <div className={styles.errorMessage} role="alert">
-            {errorMessage.email}
+            {errorMessage.emailusername}
           </div>
         )}
 
         <label className={styles.emailLabel}>
           <input
-            type="email"
-            value={input.email}
-            onChange={(e) => setInput({ ...input, email: e.target.value })}
-            autoComplete="email"
+            type="username"
+            value={input.emailusername}
+            onChange={(e) => setInput({ ...input, emailusername: e.target.value })}
+            autoComplete="username"
             required
-            placeholder="Email"
+            placeholder="Email/Username"
           />
         </label>
 

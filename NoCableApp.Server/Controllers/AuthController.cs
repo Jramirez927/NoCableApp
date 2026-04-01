@@ -89,7 +89,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.EmailUsername);
+        user ??= await _userManager.FindByNameAsync(request.EmailUsername);
         if (user is null)
             return Unauthorized(new { message = "Invalid credentials." });
 
